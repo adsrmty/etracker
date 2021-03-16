@@ -170,7 +170,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         shape: new RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(30.0)),
                         color: Colors.white,
-                        onPressed: () => navigateToWelcome(context),
+                        //onPressed: () => navigateToWelcome(context),
+                        onPressed: () => navigateToLogin(context),
                         child: new Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 20.0,

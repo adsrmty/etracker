@@ -1,29 +1,28 @@
 import 'package:flutter/material.dart';
 import 'Step2.dart';
-import 'Step3.dart';
-import 'Status.dart';
+import 'Step1.dart';
 
-class Notice2 extends StatefulWidget {
+class Notice extends StatefulWidget {
   @override
-  _Notice2State createState() => _Notice2State();
+  _NoticeState createState() => _NoticeState();
 }
 
-class _Notice2State extends State<Notice2> {
+class _NoticeState extends State<Notice> {
   final emailCtrl = TextEditingController();
-  final String WELCOME_MSG1 = 'USTED NO REGISTRO LA FOTOGRAFIA DEL CONDUCTOR EN EL SISTEMA.\n\n'
-      'REGISTRAR SU FOTOGRAFIA AUMENTA EL NIVEL DE SEGURIDAD PUES LOS MAESTROS VAN A PODER '
-      'IDENTIFICAR FISICAMENTE AL CONDUCTOR DEL VEHICULO QUE VA A RECOGER AL NIÑO(A).';
+  final String WELCOME_MSG1 = 'USTED NO REGISTRO LA PLACA DE SU AUTOMMOVIL.\n\n'
+      'REGISTRAR LA PLACA DE SU AUTOMOVIL AUMENTA EL NIVEL DE SEGURIDAD PUES LOS MAESTROS VAN A PODER '
+      'IDENTIFICAR VEHICULO QUE VA A RECOGER AL NIÑO(A).';
 
+
+  Future navigateToStep1(context) async {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Step1(),
+      settings: RouteSettings(name: "/Step1"),
+    ));
+  }
 
   Future navigateToStep2(context) async {
     Navigator.push(context, MaterialPageRoute(builder: (context) => Step2(),
       settings: RouteSettings(name: "/Step2"),
-    ));
-  }
-
-  Future navigateToStep3(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Step3(),
-      settings: RouteSettings(name: "/Step3"),
     ));
   }
 
@@ -98,7 +97,7 @@ class _Notice2State extends State<Notice2> {
                         ),
                         color: Colors.redAccent,
                         onPressed: (){
-                          navigateToStep2(context);
+                          navigateToStep1(context);
                         },
                         child: new Container(
                           padding: const EdgeInsets.symmetric(
@@ -131,7 +130,7 @@ class _Notice2State extends State<Notice2> {
                         ),
                         color: Colors.redAccent,
                         onPressed: (){
-                          navigateToStep3(context);
+                          navigateToStep2(context);
                         },
                         child: new Container(
                           padding: const EdgeInsets.symmetric(

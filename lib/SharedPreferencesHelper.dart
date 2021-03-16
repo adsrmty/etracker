@@ -1,11 +1,13 @@
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class SharedPreferencesHelper {
   static final String _carType = "car";
   static String _carColor = "color";
   static final String _carPlate = "plate";
+  static final String _emailStatus = "status";
 
   /// ------------------------------------------------------------
   ///
@@ -21,6 +23,23 @@ class SharedPreferencesHelper {
   static Future<bool> setCarType(String value) {
     final EncryptedSharedPreferences prefs =  EncryptedSharedPreferences();
     return prefs.setString(_carType, value);
+  }
+
+  /// ------------------------------------------------------------
+  ///
+  /// ------------------------------------------------------------
+  static Future <bool> getEmailStatus(){
+    final EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
+    Future <SharedPreferences> pref= prefs.getInstance();
+    return prefs.getString(_emailStatus) ?? 'Error';
+  }
+
+  /// ----------------------------------------------------------
+  ///
+  /// ----------------------------------------------------------
+  static Future<bool> setEmailStatus(String value) {
+    final EncryptedSharedPreferences prefs =  EncryptedSharedPreferences();
+    return prefs.setString(_emailStatus, value);
   }
 
   /// ------------------------------------------------------------

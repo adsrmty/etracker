@@ -3,6 +3,8 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'Notice2.dart';
 import 'Step3.dart';
+import 'Status.dart';
+import 'SecureStorage.dart';
 
 class Step2 extends StatefulWidget {
   @override
@@ -15,8 +17,11 @@ class _Step2State extends State<Step2> {
   final String ADD_PHOTO_MSG =
       'De click aquí para agregar su fotografía tipo pasaporte. Esta fotografía será la que verán los maestros cuando usted recoja al alumno(a).';
   File file;
+  final SecureStorage secureStorage = SecureStorage();
+  final String VALID_STS='valid';
+  final String INVALID_STS='invalid';
 
-  Future navigateToNotice(context) async {
+  Future navigateToNotice2(context) async {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -29,10 +34,29 @@ class _Step2State extends State<Step2> {
     if (photo == true) {
       Navigator.push(context, MaterialPageRoute(builder: (context) => Step3()));
     } else {
-      navigateToNotice(context);
+      navigateToNotice2(context);
     }
   }
 
+  Future navigateToStatus(context) async {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Status(),
+          settings: RouteSettings(name: "/Status"),
+        ));
+    //Navigator.pushNamedAndRemoveUntil(context, '/Status',  ModalRoute.withName('/Step1'));
+  }
+  _defineNextScreen(){
+    var userStatus = secureStorage.readSecureData('userStatus');
+    if (userStatus == VALID_STS){
+      navigateToStatus(context);
+    }
+    else{
+      navigateToStep3(context);
+    }
+
+  }
   void _getPicture() async {
     print("_getPicture");
     file = await FilePicker.getFile();
@@ -145,8 +169,8 @@ class _Step2State extends State<Step2> {
                           borderRadius: new BorderRadius.circular(30.0),
                         ),
                         color: Colors.redAccent,
-                        onPressed: () {
-                          navigateToStep3(context);
+                        onPressed: () {_defineNextScreen();
+                          //navigateToStep3(context);
                         },
                         child: new Container(
                           padding: const EdgeInsets.symmetric(

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_login_screens/students.dart';
 import 'package:flutter_login_screens/VehicleSettings.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart';
 import 'SignUp.dart';
 import 'Welcome.dart';
 import 'RecoverPassword.dart';
+import 'SecureStorage.dart';
 
 
 /*class Login extends StatelessWidget {
@@ -44,6 +44,11 @@ class _LoginState extends State<Login> {
       'proteger tu información y permitirte controlarla. El objetivo de esta Política'
       ' de Privacidad es informarte sobre qué datos recogemos, por qué los recogemos'
       ' y cómo puedes actualizarlos, gestionarlos, exportarlos y eliminarlos.';
+
+  final String VALID_STS='valid';
+  final String INVALID_STS='invalid';
+
+  final SecureStorage secureStorage = SecureStorage();
 
   Future navigateToWelcome(context) async {
     Navigator.pop(context);
@@ -84,6 +89,8 @@ class _LoginState extends State<Login> {
     if (!response.body.contains("Error")) {
       print("Login Success!!!");
       print("screen= " + screenFrom);
+      secureStorage.writeSecureData('userStatus', VALID_STS );
+
       if (screenFrom == '/Welcome'){
         navigateToWelcome(context);
       }
@@ -94,6 +101,7 @@ class _LoginState extends State<Login> {
         navigateToVehicleSettings(context);
       }
     } else {
+      secureStorage.writeSecureData('userStatus', INVALID_STS );
       var list = response.body.split(",");
       print("response.body= " + response.body );
       print("list[1]= " +list[1] );
