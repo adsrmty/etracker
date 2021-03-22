@@ -7,7 +7,7 @@ import 'SignUp.dart';
 import 'Welcome.dart';
 import 'RecoverPassword.dart';
 import 'SecureStorage.dart';
-
+import 'dart:convert';
 
 /*class Login extends StatelessWidget {
   String screenFrom;
@@ -28,7 +28,7 @@ import 'SecureStorage.dart';
 class Login extends StatefulWidget {
   String screenToGo;
 
-  Login ({this.screenToGo});
+  Login({this.screenToGo});
 
   @override
   _LoginState createState() => _LoginState();
@@ -37,38 +37,51 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
-  final String WEBPAGE='https://etracker.mx/etsAppInterface/dbConnETS.php';
+  final String WEBPAGE = 'https://etracker.mx/etsAppInterface/dbConnETS.php';
+  final String WEBPAGE2 = 'http://10.0.2.2:3000';
 
-  final String TERMS_MSG='Al utilizar nuestros servicios, nos confías tus datos. '
+  final String TERMS_MSG =
+      'Al utilizar nuestros servicios, nos confías tus datos. '
       'Entendemos que es una gran responsabilidad y nos esforzamos al máximo para '
       'proteger tu información y permitirte controlarla. El objetivo de esta Política'
       ' de Privacidad es informarte sobre qué datos recogemos, por qué los recogemos'
       ' y cómo puedes actualizarlos, gestionarlos, exportarlos y eliminarlos.';
 
-  final String VALID_STS='valid';
-  final String INVALID_STS='invalid';
+  final String VALID_STS = 'valid';
+  final String INVALID_STS = 'invalid';
+  final int ERROR_TYPE = 1;
+  final int USER_STATUS = 1;
 
   final SecureStorage secureStorage = SecureStorage();
 
   Future navigateToWelcome(context) async {
     Navigator.pop(context);
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Welcome(),
-      settings: RouteSettings(name: "/Welcome"),
-    ));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Welcome(),
+          settings: RouteSettings(name: "/Welcome"),
+        ));
   }
 
   Future navigateToStudents(context) async {
     Navigator.pop(context);
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Students(),
-      settings: RouteSettings(name: "/Students"),
-    ));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Students(),
+          settings: RouteSettings(name: "/Students"),
+        ));
   }
 
   Future navigateToVehicleSettings(context) async {
     Navigator.pop(context);
-    Navigator.push(context, MaterialPageRoute(builder: (context) => VehicleSettings(),
-      settings: RouteSettings(name: "/VehicleSettings"),
-    ));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VehicleSettings(),
+          settings: RouteSettings(name: "/VehicleSettings"),
+        ));
   }
 
   @override
@@ -78,36 +91,58 @@ class _LoginState extends State<Login> {
     super.dispose();
   }
 
-  Future<void> _login(String screenFrom) async{
+  Future<void> _login(String screenFrom) async {
+    _userValid();
     print('User=' + emailCtrl.text + ' password=' + passwordCtrl.text);
     var map = Map<String, dynamic>();
-    map['action'] = 'login' ;
-    map['input1'] = emailCtrl.text ;
+    map['action'] = 'login';
+    map['input1'] = emailCtrl.text;
     map['input2'] = passwordCtrl.text;
     Response response = await post(WEBPAGE, body: map);
     print("Response: " + response.body);
     if (!response.body.contains("Error")) {
       print("Login Success!!!");
       print("screen= " + screenFrom);
-      secureStorage.writeSecureData('userStatus', VALID_STS );
-
-      if (screenFrom == '/Welcome'){
+      //secureStorage.writeSecureData('userStatus', VALID_STS );
+      if (screenFrom == '/Welcome') {
         navigateToWelcome(context);
-      }
-      else if (screenFrom == '/Students'){
+      } else if (screenFrom == '/Students') {
         navigateToStudents(context);
-      }
-      else if (screenFrom == '/VehicleSettings'){
+      } else if (screenFrom == '/VehicleSettings') {
         navigateToVehicleSettings(context);
       }
     } else {
-      secureStorage.writeSecureData('userStatus', INVALID_STS );
+      //secureStorage.writeSecureData('userStatus', INVALID_STS );
       var list = response.body.split(",");
-      print("response.body= " + response.body );
-      print("list[1]= " +list[1] );
-      _showDialog('Error', list[1] );
-      print("Error" );
+      print("response.body= " + response.body);
+      print("list[1]= " + list[ERROR_TYPE]);
+      _showDialog('Error', list[ERROR_TYPE]);
+      print("Error");
     }
+  }
+
+  Future <void> _userValid() async {
+    print('_userValid()');
+    print('User=' + emailCtrl.text);
+    var map = Map<String, dynamic>();
+    map['action'] = 'getUserStatus';
+    map['input1'] = emailCtrl.text;
+    Response response = await post(
+      WEBPAGE2,
+      /*headers: <String, String>{
+        //'Content-Type': 'application/json; charset=UTF-8',
+        'Content-Type': 'application/text; charset=UTF-8',
+      },
+      body: json.encode(<String, String>{
+        'title': 'dedede',
+      }),*/
+      body: map,
+    );
+    print("Response: " + response.body);
+    var list = response.body.split(",");
+    print("response.body= " + response.body);
+    print("list[1]= " + list[1]);
+    secureStorage.writeSecureData('userStatus', list[USER_STATUS] );
   }
 
   void _showDialog(String title, String msg) {
@@ -133,15 +168,14 @@ class _LoginState extends State<Login> {
     );
   }
 
-
   Future navigateToRecoverPassword(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => RecoverPassword()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => RecoverPassword()));
   }
 
   Future navigateToSignUp(context) async {
     Navigator.push(context, MaterialPageRoute(builder: (context) => SignUp()));
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +222,8 @@ class _LoginState extends State<Login> {
               ),
               new Container(
                 width: MediaQuery.of(context).size.width,
-                margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 10.0),
+                margin:
+                    const EdgeInsets.only(left: 40.0, right: 40.0, top: 10.0),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   border: Border(
@@ -240,7 +275,8 @@ class _LoginState extends State<Login> {
               ),
               new Container(
                 width: MediaQuery.of(context).size.width,
-                margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 10.0),
+                margin:
+                    const EdgeInsets.only(left: 40.0, right: 40.0, top: 10.0),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   border: Border(
@@ -275,7 +311,8 @@ class _LoginState extends State<Login> {
                 children: <Widget>[
                   Container(
                     height: 50.0,
-                    padding: const EdgeInsets.only(right: 20.0, top:0, bottom:0),
+                    padding:
+                        const EdgeInsets.only(right: 20.0, top: 0, bottom: 0),
                     child: new FlatButton(
                       child: new Text(
                         "Olvidaste tu contraseña?",
@@ -286,9 +323,7 @@ class _LoginState extends State<Login> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      onPressed: () => {
-                        navigateToRecoverPassword(context)
-                      },
+                      onPressed: () => {navigateToRecoverPassword(context)},
                     ),
                   ),
                 ],
@@ -317,7 +352,8 @@ class _LoginState extends State<Login> {
                 ],
               ),
               Container(
-                margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
+                margin:
+                    const EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
                 child: new RichText(
                   textAlign: TextAlign.center,
                   text: new TextSpan(
@@ -329,12 +365,12 @@ class _LoginState extends State<Login> {
                       new TextSpan(
                         text: 'Términos y Politica de Privacidad',
                         style: new TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue),
+                            fontWeight: FontWeight.bold, color: Colors.blue),
                         recognizer: new TapGestureRecognizer()
                           ..onTap = () {
                             //launch('https://www.gmail.com ');
-                            _showDialog('Términos y Políticas de Privacidad', TERMS_MSG);
+                            _showDialog('Términos y Políticas de Privacidad',
+                                TERMS_MSG);
                           },
                       ),
                     ],
@@ -343,7 +379,8 @@ class _LoginState extends State<Login> {
               ),
               new Container(
                 width: MediaQuery.of(context).size.width,
-                margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 40.0),
+                margin:
+                    const EdgeInsets.only(left: 30.0, right: 30.0, top: 40.0),
                 alignment: Alignment.center,
                 child: new Row(
                   children: <Widget>[
@@ -353,7 +390,7 @@ class _LoginState extends State<Login> {
                           borderRadius: new BorderRadius.circular(30.0),
                         ),
                         color: Colors.redAccent,
-                        onPressed: (){
+                        onPressed: () {
                           _login(widget.screenToGo);
                         },
                         child: new Container(
@@ -365,7 +402,8 @@ class _LoginState extends State<Login> {
                             "Ingresar",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.bold),
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -380,4 +418,3 @@ class _LoginState extends State<Login> {
     );
   }
 }
-

@@ -3,6 +3,7 @@ import 'Status.dart';
 import 'dart:math';
 import 'DbHelperStudent.dart';
 import 'student.dart';
+import 'package:http/http.dart';
 
 class Step3 extends StatefulWidget {
   @override
@@ -10,8 +11,8 @@ class Step3 extends StatefulWidget {
 }
 
 class _Step3State extends State<Step3> {
-  final _pickupKeyCtrl = TextEditingController();
   final _schoolKeyCtrl = TextEditingController();
+  final _pickupKeyCtrl = TextEditingController();
   final String REGISTER_MSG = 'Estos datos son proporcionados por la escuela,'
       ' contacte por favor a la escuela para más detalles.';
   var _name = new List(5);// creates an empty array of length 5
@@ -19,6 +20,16 @@ class _Step3State extends State<Step3> {
   var _time = new List(5);// creates an empty array of length 5
   Random _random = new Random();
   DbHelperStudent _db = new DbHelperStudent();
+  final String WEBPAGE2 = 'http://10.0.2.2:3000';
+  final int STUDENT_NAME = 1;
+  final int STUDENT_LAST_NAME = 2;
+  final int CAR = 3;
+  final int COLOR = 4;
+  final int PLATES = 5;
+  final int STATUS = 6;
+  final String ACTIVE = 'Active';
+  final String INACTIVE = 'Inactive';
+  var list;
 
   Future navigateToStatus(context) async {
     Navigator.push(
@@ -58,13 +69,47 @@ class _Step3State extends State<Step3> {
 
   int next(int min, int max) => min + _random.nextInt(max - min);
 
-  Function _addStudent() {
+   _getUserInfo() {
+    return () async {
+
+      print('_getUserInfo()');
+      var map = Map<String, dynamic>();
+      map['action'] = 'getUserInfo';
+      map['input1'] = _schoolKeyCtrl.text;
+      map['input2'] = _pickupKeyCtrl.text;
+      Response response = await post(
+        WEBPAGE2,
+        /*headers: <String, String>{
+        //'Content-Type': 'application/json; charset=UTF-8',
+        'Content-Type': 'application/text; charset=UTF-8',
+      },
+      body: json.encode(<String, String>{
+        'title': 'dedede',
+      }),*/
+        body: map,
+      );
+      print("Response: " + response.body);
+      list = response.body.split(",");
+      print("response.body= " + response.body);
+      print("list[1]= " + list[STUDENT_NAME]);
+      print("list[2]= " + list[STUDENT_LAST_NAME]);
+      print("list[3]= " + list[CAR]);
+      print("list[4]= " + list[COLOR]);
+      print("list[5]= " + list[PLATES]);
+      print("list[6]= " + list[STATUS]);
+      print("AEEEEEE");
+      if (list[STATUS] == 'Active'){
+        print("ACTIVE");
+        _addStudent();
+      }
+    };
+  }
+   _addStudent() {
     if (_pickupKeyCtrl.text.isEmpty || _schoolKeyCtrl.text.isEmpty) {
       print("Returning NULLLLL");
-      return null;
-    } else {
-      return () {
-        print("Returning Function");
+    }
+    else {
+        print("_addStudent");
         int random= next(0, 4);
         // Function to get _name, _school and _time from remote server will be here
         // Call the function here
@@ -72,8 +117,7 @@ class _Step3State extends State<Step3> {
         Student student = new Student(_pickupKeyCtrl.text, _schoolKeyCtrl.text, _name[random], _school[random], _time[random]);
         _db.saveStudent(student);
         navigateToStatus(context);
-      };
-    }
+      }
   }
 
   @override
@@ -233,7 +277,7 @@ class _Step3State extends State<Step3> {
                         ),
                         color: Colors.redAccent,
                         disabledColor: Colors.grey,
-                        onPressed: _addStudent(),
+                        onPressed: _getUserInfo(),
                         child: new Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 20.0,

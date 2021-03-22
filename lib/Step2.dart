@@ -47,14 +47,17 @@ class _Step2State extends State<Step2> {
         ));
     //Navigator.pushNamedAndRemoveUntil(context, '/Status',  ModalRoute.withName('/Step1'));
   }
-  _defineNextScreen(){
+  Future <void> _defineNextScreen(){
     var userStatus = secureStorage.readSecureData('userStatus');
-    if (userStatus == VALID_STS){
-      navigateToStatus(context);
-    }
-    else{
-      navigateToStep3(context);
-    }
+    userStatus.then((value) {
+      print("userStatus= "   + value);
+      if (value == VALID_STS){
+        navigateToStatus(context);
+      }
+      else{
+        navigateToStep3(context);
+      }
+    });
 
   }
   void _getPicture() async {
