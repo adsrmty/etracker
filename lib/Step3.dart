@@ -4,6 +4,7 @@ import 'dart:math';
 import 'DbHelperStudent.dart';
 import 'student.dart';
 import 'package:http/http.dart';
+import 'SharedPreferencesHelper.dart';
 
 class Step3 extends StatefulWidget {
   @override
@@ -15,21 +16,14 @@ class _Step3State extends State<Step3> {
   final _pickupKeyCtrl = TextEditingController();
   final String REGISTER_MSG = 'Estos datos son proporcionados por la escuela,'
       ' contacte por favor a la escuela para más detalles.';
-  var _name = new List(5);// creates an empty array of length 5
-  var _school = new List(5);// creates an empty array of length 5
-  var _time = new List(5);// creates an empty array of length 5
   Random _random = new Random();
   DbHelperStudent _db = new DbHelperStudent();
   final String WEBPAGE2 = 'http://10.0.2.2:3000';
+  final int RESULT_STATUS = 1;
   final int STUDENT_NAME = 1;
-  final int STUDENT_LAST_NAME = 2;
-  final int CAR = 3;
-  final int COLOR = 4;
-  final int PLATES = 5;
-  final int STATUS = 6;
-  final String ACTIVE = 'Active';
-  final String INACTIVE = 'Inactive';
-  var list;
+  final int SCHOOLE_NAME = 2;
+  final int SCHEDULE = 3;
+  final int EXPIRE = 4;
 
   Future navigateToStatus(context) async {
     Navigator.push(
@@ -43,38 +37,22 @@ class _Step3State extends State<Step3> {
 
   @override
   void initState() {
-    // assigning values to all the indices
-    _name[0] = 'Alondra Maya';
-    _name[1] = 'Erendira Garcia';
-    _name[2] = 'Elia Valentina';
-    _name[3] = 'Oliver Atom';
-    _name[4] = 'Ikaru Tatsumura';
-
-    // assigning values to all the indices
-    _school[0] = 'Vicente Guerrero';
-    _school[1] = 'Tec de Monterrey';
-    _school[2] = 'Egade Bussiness Schools';
-    _school[3] = 'UDEM';
-    _school[4] = 'Montesori';
-
-    // assigning values to all the indices
-    _time[0] = '12:00 PM';
-    _time[1] = '13:00 PM';
-    _time[2] = '14:00 PM';
-    _time[3] = '15:00 PM';
-    _time[4] = '16:00 PM';
-
     super.initState();
   }
 
   int next(int min, int max) => min + _random.nextInt(max - min);
 
-   _getUserInfo() {
+  _getStudentInfo() {
+    print("_getStudentInfo");
     return () async {
+      print("async");
+      if (_pickupKeyCtrl.text.isEmpty || _schoolKeyCtrl.text.isEmpty) {
+        print("_pickupKeyCtrl and _schoolKeyCtrl field are empty");
+      }
 
-      print('_getUserInfo()');
+      print("NOT NULL");
       var map = Map<String, dynamic>();
-      map['action'] = 'getUserInfo';
+      map['action'] = 'getStudentInfo';
       map['input1'] = _schoolKeyCtrl.text;
       map['input2'] = _pickupKeyCtrl.text;
       Response response = await post(
@@ -89,36 +67,86 @@ class _Step3State extends State<Step3> {
         body: map,
       );
       print("Response: " + response.body);
-      list = response.body.split(",");
-      print("response.body= " + response.body);
-      print("list[1]= " + list[STUDENT_NAME]);
-      print("list[2]= " + list[STUDENT_LAST_NAME]);
-      print("list[3]= " + list[CAR]);
-      print("list[4]= " + list[COLOR]);
-      print("list[5]= " + list[PLATES]);
-      print("list[6]= " + list[STATUS]);
-      print("AEEEEEE");
-      if (list[STATUS] == 'Active'){
-        print("ACTIVE");
-        _addStudent();
+      var list = response.body.split(",");
+      if (!response.body.contains("Error")) {
+        print("response.body= " + response.body);
+        print("list[$STUDENT_NAME]= " + list[STUDENT_NAME]);
+        print("list[$SCHOOLE_NAME]= " + list[SCHOOLE_NAME]);
+        print("list[$SCHEDULE]= " + list[SCHEDULE]);
+        print("list[$EXPIRE]= " + list[EXPIRE]);
+        _addStudent(list);
+
       }
     };
   }
-   _addStudent() {
-    if (_pickupKeyCtrl.text.isEmpty || _schoolKeyCtrl.text.isEmpty) {
-      print("Returning NULLLLL");
+
+  _addStudent(var list) {
+    print("_addStudent");
+
+    var now = new DateTime.now();
+
+    int year = int.parse("20" + list[EXPIRE].substring(0, 2));
+    int month = int.parse(list[EXPIRE].substring(2, 4));
+    int day = int.parse(list[EXPIRE].substring(4, 6));
+    var newDate = new DateTime(year, month, day, 23, 59, 00);
+
+    // date received is greater than current day that means expiration date is in the future
+    print("compare to= "  + newDate.compareTo(now).toString());
+    if(newDate.compareTo(now) > 0){
+      Student student = new Student(_pickupKeyCtrl.text, _schoolKeyCtrl.text,
+          list[STUDENT_NAME], list[SCHOOLE_NAME], list[SCHEDULE], list[EXPIRE]);
+      _db.saveStudent(student);
+      _setPickupKeys();
+      navigateToStatus(context);
     }
-    else {
-        print("_addStudent");
-        int random= next(0, 4);
-        // Function to get _name, _school and _time from remote server will be here
-        // Call the function here
-        //
-        Student student = new Student(_pickupKeyCtrl.text, _schoolKeyCtrl.text, _name[random], _school[random], _time[random]);
-        _db.saveStudent(student);
-        navigateToStatus(context);
-      }
+    else{
+      _showMaterialDialog();
+    }
   }
+  _showMaterialDialog() {
+    showDialog(
+        context: context,
+        builder: (_) => new AlertDialog(
+          title: new Text("Alerta!"),
+          content: new Text("La llave es invalida o ha caducado"),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cerrar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ));
+  }
+  Future<void> _setPickupKeys() async {
+    print("_setPickupKeys");
+    String email = await SharedPreferencesHelper.getEmail();
+    var map = Map<String, dynamic>();
+    map['action'] = 'setPickupKeys';
+    map['input1'] = email;
+    map['input2'] = _pickupKeyCtrl.text;
+    map['input3'] = _schoolKeyCtrl.text;
+    Response response = await post(
+      WEBPAGE2,
+      /*headers: <String, String>{
+        //'Content-Type': 'application/json; charset=UTF-8',
+        'Content-Type': 'application/text; charset=UTF-8',
+      },
+      body: json.encode(<String, String>{
+        'title': 'dedede',
+      }),*/
+      body: map,
+    );
+    print("Response: " + response.body);
+    var list = response.body.split(",");
+    if (!response.body.contains("Error")) {
+      print("result = " + list[RESULT_STATUS]);
+    }
+    else{
+      print("Error = " + list[RESULT_STATUS+1]);
+    }
+}
 
   @override
   void dispose() {
@@ -277,7 +305,7 @@ class _Step3State extends State<Step3> {
                         ),
                         color: Colors.redAccent,
                         disabledColor: Colors.grey,
-                        onPressed: _getUserInfo(),
+                        onPressed: _getStudentInfo(),
                         child: new Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 20.0,

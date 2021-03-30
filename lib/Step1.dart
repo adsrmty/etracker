@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'SharedPreferencesHelper.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart';
 import 'Step2.dart';
 import 'Notice.dart';
 import 'CarList.dart';
@@ -15,6 +16,8 @@ class Step1 extends StatefulWidget {
 
 class _Step1State extends State<Step1> {
   final plateCtrl = TextEditingController();
+  final String WEBPAGE2 = 'http://10.0.2.2:3000';
+  final int RESULT_STATUS = 1;
 
   List _cars = [
     "SUV",
@@ -68,15 +71,47 @@ class _Step1State extends State<Step1> {
   }
 
   Future navigateToStep2(context) async {
-    if (plateCtrl.text.isEmpty || plateCtrl.text.length > 3) {
+    print("navigateToStep2");
+    if (plateCtrl.text.isEmpty || plateCtrl.text.length != 3) {
       navigateToNotice(context);
     } else {
+      _setUserInfo();
       Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => Step2(),
             settings: RouteSettings(name: "/Step2"),
           ));
+    }
+  }
+
+  Future<void> _setUserInfo() async {
+    print('_setUserInfo()');
+    String email = await SharedPreferencesHelper.getEmail();
+
+    var map = Map<String, dynamic>();
+    map['action'] = 'setUserInfo';
+    map['input1'] = email;
+    map['input2'] = _selectedCar;
+    map['input3'] = _selectedColor.value.toRadixString(16);
+    map['input4'] = plateCtrl.text;
+
+    Response response = await post(
+      WEBPAGE2,
+      /*headers: <String, String>{
+        //'Content-Type': 'application/json; charset=UTF-8',
+        'Content-Type': 'application/text; charset=UTF-8',
+      },
+      body: json.encode(<String, String>{
+        'title': 'dedede',
+      }),*/
+      body: map,
+    );
+    var list = response.body.split(",");
+    if (!response.body.contains("Error")) {
+      print("result = " + list[RESULT_STATUS]);
+    } else {
+      print("Error = " + list[RESULT_STATUS + 1]);
     }
   }
 
@@ -388,6 +423,7 @@ class _Step1State extends State<Step1> {
                           SharedPreferencesHelper.setCarPlate(plateCtrl.text);
                         },
                         textAlign: TextAlign.left,
+                        maxLength: 3,
                         decoration: InputDecoration(
                           hintText: 'Escribe los últimos 3 dígitos tus placas',
                         ),

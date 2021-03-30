@@ -6,10 +6,11 @@ class Student {
   String _schoolKey;
   String _name;
   String _school;
-  String _time;
+  String _schedule;
+  String _expire;
   bool _checkBox=false;
 
-  Student(this._pickupKey, this._schoolKey, this._name, this._school, this._time){
+  Student(this._pickupKey, this._schoolKey, this._name, this._school, this._schedule, this._expire){
     print('El nombre= ' + this._name);
   }
 
@@ -18,7 +19,9 @@ class Student {
   String get getSchoolKey => _schoolKey;
   String get getName => _name;
   String get getSchool => _school;
-  String get getTime => _time;
+  String get getSchedule => _schedule;
+  bool get getExpire => _checkBox;
+  void set setExpire(String value) => _expire= value;
   bool get getCheckBox => _checkBox;
   void set setCheckBox(bool value) => _checkBox= value;
 
@@ -28,7 +31,8 @@ class Student {
     this._school = obj['schoolKey'];
     this._name = obj['name'];
     this._school = obj['school'];
-    this._time = obj['time'];
+    this._schedule = obj['schedule'];
+    this._expire = obj['expire'];
   }
 
   Map<String, dynamic> toMap() {
@@ -40,7 +44,9 @@ class Student {
     map['schoolKey'] = _school;
     map['name'] = _name;
     map['school'] = _school;
-    map['time'] = _time;
+    map['schedule'] = _schedule;
+    map['expire'] = _expire;
+
 
     return map;
   }
@@ -51,7 +57,8 @@ class Student {
     this._schoolKey = map['schoolKey'];
     this._name = map['name'];
     this._school = map['school'];
-    this._time = map['time'];
+    this._schedule = map['schedule'];
+    this._expire = map['expire'];
   }
 
 }

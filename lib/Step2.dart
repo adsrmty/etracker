@@ -18,8 +18,6 @@ class _Step2State extends State<Step2> {
       'De click aquí para agregar su fotografía tipo pasaporte. Esta fotografía será la que verán los maestros cuando usted recoja al alumno(a).';
   File file;
   final SecureStorage secureStorage = SecureStorage();
-  final String VALID_STS='valid';
-  final String INVALID_STS='invalid';
 
   Future navigateToNotice2(context) async {
     Navigator.push(
@@ -47,19 +45,7 @@ class _Step2State extends State<Step2> {
         ));
     //Navigator.pushNamedAndRemoveUntil(context, '/Status',  ModalRoute.withName('/Step1'));
   }
-  Future <void> _defineNextScreen(){
-    var userStatus = secureStorage.readSecureData('userStatus');
-    userStatus.then((value) {
-      print("userStatus= "   + value);
-      if (value == VALID_STS){
-        navigateToStatus(context);
-      }
-      else{
-        navigateToStep3(context);
-      }
-    });
 
-  }
   void _getPicture() async {
     print("_getPicture");
     file = await FilePicker.getFile();
@@ -172,8 +158,8 @@ class _Step2State extends State<Step2> {
                           borderRadius: new BorderRadius.circular(30.0),
                         ),
                         color: Colors.redAccent,
-                        onPressed: () {_defineNextScreen();
-                          //navigateToStep3(context);
+                        onPressed: () {
+                          navigateToStep3(context);
                         },
                         child: new Container(
                           padding: const EdgeInsets.symmetric(

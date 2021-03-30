@@ -25,7 +25,9 @@ class StudentsState extends State<Students> {
           builder: (context) => AddStudent(),
           settings: RouteSettings(name: "/AddStudent"),
         )).then((val) => {
-          setState(() {initState();}),
+          setState(() {
+            initState();
+          }),
         });
   }
 
@@ -40,8 +42,23 @@ class StudentsState extends State<Students> {
           print(item['id']);
           print(item['name']);
           print(item['school']);
-          print(item['time']);
-          _students.add(Student.fromMap(item));
+          print(item['schedule']);
+          print(item['expire']);
+
+          var now = new DateTime.now();
+
+          int year = int.parse("20" + item['expire'].substring(0, 2));
+          int month = int.parse(item['expire'].substring(2, 4));
+          int day = int.parse(item['expire'].substring(4, 6));
+          var newDate = new DateTime(year, month, day, 23, 59, 00);
+
+          // date received is greater than current day that means expiration date is in the future
+          print("compare to= " + newDate.compareTo(now).toString());
+          if (newDate.compareTo(now) > 0) {
+            _students.add(Student.fromMap(item));
+          } else {
+            _db.deleteStudent(item['id']);
+          }
         });
       });
       print("_students length= ${_students.length}");
@@ -61,7 +78,7 @@ class StudentsState extends State<Students> {
     print('_deleteMsgs');
     _selectedStudents.forEach((student) async {
       print(
-          "id= ${student.getId}, name= ${student.getName}, school= ${student.getSchool}, time= ${student.getTime}");
+          "id= ${student.getId}, name= ${student.getName}, school= ${student.getSchool}, schedule= ${student.getSchedule}, expire= ${student.getExpire}");
       await _db.deleteStudent(student.getId);
     });
 
@@ -162,7 +179,7 @@ class StudentsState extends State<Students> {
                       Text(student.getSchool ?? 'default value'),
                     ),
                     DataCell(
-                      Text(student.getTime ?? 'default value'),
+                      Text(student.getSchedule ?? 'default value'),
                     ),
                   ]),
             )

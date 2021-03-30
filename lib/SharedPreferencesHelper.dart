@@ -7,7 +7,7 @@ class SharedPreferencesHelper {
   static final String _carType = "car";
   static String _carColor = "color";
   static final String _carPlate = "plate";
-  static final String _emailStatus = "status";
+  static final String _email = "status";
 
   /// ------------------------------------------------------------
   ///
@@ -28,18 +28,18 @@ class SharedPreferencesHelper {
   /// ------------------------------------------------------------
   ///
   /// ------------------------------------------------------------
-  static Future <bool> getEmailStatus(){
+  static Future <String> getEmail(){
     final EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
     Future <SharedPreferences> pref= prefs.getInstance();
-    return prefs.getString(_emailStatus) ?? 'Error';
+    return prefs.getString(_email) ?? 'Error';
   }
 
   /// ----------------------------------------------------------
   ///
   /// ----------------------------------------------------------
-  static Future<bool> setEmailStatus(String value) {
+  static Future<bool> setEmail(String value) {
     final EncryptedSharedPreferences prefs =  EncryptedSharedPreferences();
-    return prefs.setString(_emailStatus, value);
+    return prefs.setString(_email, value);
   }
 
   /// ------------------------------------------------------------

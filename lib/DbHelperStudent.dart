@@ -16,7 +16,8 @@ class DbHelperStudent {
   final String columnSchoolKey = 'schoolKey';
   final String columnName = 'name';
   final String columnSchool = 'school';
-  final String columnTime = 'time';
+  final String columnSchedule = 'schedule';
+  final String columnExpire = 'expire';
 
   static Database _db;
 
@@ -25,14 +26,14 @@ class DbHelperStudent {
   Future<Database> get getDb async {
     if (_db == null) {
       _db = await _initDb();
+      _createDbTable();
     }
-    _createDbTable();
     return _db;
   }
 
   Future<void> _createDbTable() async{
     await _db.execute(
-        'CREATE TABLE IF NOT EXISTS $tableStudent($columnId INTEGER PRIMARY KEY, $columnPickupKey TEXT, $columnSchoolKey TEXT, $columnName TEXT, $columnSchool TEXT, $columnTime TEXT)');
+        'CREATE TABLE IF NOT EXISTS $tableStudent($columnId INTEGER PRIMARY KEY, $columnPickupKey TEXT, $columnSchoolKey TEXT, $columnName TEXT, $columnSchool TEXT deded, $columnSchedule TEXT, $columnExpire TEXT)');
   }
 
   _initDb() async {
@@ -46,7 +47,7 @@ class DbHelperStudent {
   void _onCreate(Database db, int newVersion) async {
     print('_onCreate Student Table');
     await db.execute(
-        'CREATE TABLE $tableStudent($columnId INTEGER PRIMARY KEY, $columnPickupKey TEXT, $columnSchoolKey TEXT, $columnName TEXT, $columnSchool TEXT, $columnTime TEXT)');
+        'CREATE TABLE $tableStudent($columnId INTEGER PRIMARY KEY, $columnPickupKey TEXT, $columnSchoolKey TEXT, $columnName TEXT, $columnSchool TEXT, $columnSchedule TEXT, $columnExpire TEXT)');
   }
 
   Future<int> saveStudent(Student student) async {
@@ -59,7 +60,7 @@ class DbHelperStudent {
   Future<List> getAllStudents() async {
     print('getAllStudents()');
     var dbClient = await getDb;
-    var result = await dbClient.query(tableStudent, columns: [columnId, columnPickupKey, columnSchoolKey, columnName, columnSchool, columnTime]);
+    var result = await dbClient.query(tableStudent, columns: [columnId, columnPickupKey, columnSchoolKey, columnName, columnSchool, columnSchedule, columnExpire]);
     return result.toList();
   }
 
@@ -71,7 +72,7 @@ class DbHelperStudent {
   Future<Student> getStudent(int id) async {
     var dbClient = await getDb;
     List<Map> result = await dbClient.query(tableStudent,
-        columns: [columnId, columnPickupKey, columnSchoolKey, columnName, columnSchool, columnTime],
+        columns: [columnId, columnPickupKey, columnSchoolKey, columnName, columnSchool, columnSchedule, columnExpire],
         where: '$columnId = ?',
         whereArgs: [id]);
 
@@ -103,6 +104,7 @@ class DbHelperStudent {
 
   Future<void> deleteDb() async {
     String databasesPath = await getDatabasesPath();
+    //deleteDatabase("/data/data/mx.etracker.flutterapp/databases/etracker.db");
     String path = join(databasesPath, databaseName);
     await deleteDatabase(path);
   }

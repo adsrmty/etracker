@@ -7,6 +7,8 @@ import 'SignUp.dart';
 import 'Welcome.dart';
 import 'RecoverPassword.dart';
 import 'SecureStorage.dart';
+import 'SharedPreferencesHelper.dart';
+import 'DbHelperStudent.dart';
 import 'dart:convert';
 
 /*class Login extends StatelessWidget {
@@ -39,19 +41,13 @@ class _LoginState extends State<Login> {
   final passwordCtrl = TextEditingController();
   final String WEBPAGE = 'https://etracker.mx/etsAppInterface/dbConnETS.php';
   final String WEBPAGE2 = 'http://10.0.2.2:3000';
-
   final String TERMS_MSG =
       'Al utilizar nuestros servicios, nos confías tus datos. '
       'Entendemos que es una gran responsabilidad y nos esforzamos al máximo para '
       'proteger tu información y permitirte controlarla. El objetivo de esta Política'
       ' de Privacidad es informarte sobre qué datos recogemos, por qué los recogemos'
       ' y cómo puedes actualizarlos, gestionarlos, exportarlos y eliminarlos.';
-
-  final String VALID_STS = 'valid';
-  final String INVALID_STS = 'invalid';
-  final int ERROR_TYPE = 1;
-  final int USER_STATUS = 1;
-
+  final int RESULT_STATUS = 1;
   final SecureStorage secureStorage = SecureStorage();
 
   Future navigateToWelcome(context) async {
@@ -92,7 +88,6 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> _login(String screenFrom) async {
-    _userValid();
     print('User=' + emailCtrl.text + ' password=' + passwordCtrl.text);
     var map = Map<String, dynamic>();
     map['action'] = 'login';
@@ -100,10 +95,14 @@ class _LoginState extends State<Login> {
     map['input2'] = passwordCtrl.text;
     Response response = await post(WEBPAGE, body: map);
     print("Response: " + response.body);
+    var list = response.body.split(",");
     if (!response.body.contains("Error")) {
+      DbHelperStudent _db = new DbHelperStudent();
+      _db.deleteDb();
       print("Login Success!!!");
       print("screen= " + screenFrom);
-      //secureStorage.writeSecureData('userStatus', VALID_STS );
+      //secureStorage.writeSecureData('email', emailCtrl.text );
+      SharedPreferencesHelper.setEmail(emailCtrl.text);
       if (screenFrom == '/Welcome') {
         navigateToWelcome(context);
       } else if (screenFrom == '/Students') {
@@ -112,37 +111,9 @@ class _LoginState extends State<Login> {
         navigateToVehicleSettings(context);
       }
     } else {
-      //secureStorage.writeSecureData('userStatus', INVALID_STS );
-      var list = response.body.split(",");
-      print("response.body= " + response.body);
-      print("list[1]= " + list[ERROR_TYPE]);
-      _showDialog('Error', list[ERROR_TYPE]);
-      print("Error");
+      print("Error = " + list[RESULT_STATUS + 1]);
+      _showDialog('Error', list[RESULT_STATUS+1]);
     }
-  }
-
-  Future <void> _userValid() async {
-    print('_userValid()');
-    print('User=' + emailCtrl.text);
-    var map = Map<String, dynamic>();
-    map['action'] = 'getUserStatus';
-    map['input1'] = emailCtrl.text;
-    Response response = await post(
-      WEBPAGE2,
-      /*headers: <String, String>{
-        //'Content-Type': 'application/json; charset=UTF-8',
-        'Content-Type': 'application/text; charset=UTF-8',
-      },
-      body: json.encode(<String, String>{
-        'title': 'dedede',
-      }),*/
-      body: map,
-    );
-    print("Response: " + response.body);
-    var list = response.body.split(",");
-    print("response.body= " + response.body);
-    print("list[1]= " + list[1]);
-    secureStorage.writeSecureData('userStatus', list[USER_STATUS] );
   }
 
   void _showDialog(String title, String msg) {
