@@ -2,8 +2,21 @@ import 'package:flutter/material.dart';
 import 'Step1.dart';
 
 class Welcome extends StatefulWidget {
+  const Welcome({super.key, required this.title});
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
   @override
-  _WelcomeState createState() => _WelcomeState();
+  State<Welcome> createState() => _WelcomeState();
 }
 
 class _WelcomeState extends State<Welcome> {
@@ -19,8 +32,8 @@ class _WelcomeState extends State<Welcome> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Step1(),
-          settings: RouteSettings(name: "/Step1"),
+          builder: (context) => Step1(title: "Step1"),
+          settings: const RouteSettings(name: "/Step1"),
         ));
   }
 
@@ -33,17 +46,17 @@ class _WelcomeState extends State<Welcome> {
           decoration: BoxDecoration(
             color: Colors.white,
             image: DecorationImage(
-              colorFilter: new ColorFilter.mode(
+              colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(0.1), BlendMode.dstATop),
               image: AssetImage('assets/images/ninos2.jpg'),
               fit: BoxFit.cover,
             ),
           ),
-          child: new Column(
+          child: Column(
             children: <Widget>[
               Container(
                 padding: EdgeInsets.all(40.0),
-                child: Center(
+                child: const Center(
                   child: Icon(
                     Icons.headset_mic,
                     color: Colors.redAccent,
@@ -51,10 +64,10 @@ class _WelcomeState extends State<Welcome> {
                   ),
                 ),
               ),
-              new Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  new Text(
+                  Text(
                     'Bienvendido a eTracker Schools.\n\n',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -64,15 +77,15 @@ class _WelcomeState extends State<Welcome> {
                   ),
                 ],
               ),
-              new Row(
+              Row(
                 children: <Widget>[
-                  new Expanded(
-                    child: new Padding(
+                  Expanded(
+                    child: Padding(
                       padding: const EdgeInsets.only(left: 40.0, right: 40.0),
-                      child: new Text(
+                      child: Text(
                         WELCOME_MSG1,
                         textAlign: TextAlign.left,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 15.0,
                         ),
@@ -82,24 +95,23 @@ class _WelcomeState extends State<Welcome> {
                 ],
               ),
               Container(
-                margin: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
-                child: new Row(
+                margin: const EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
+                child: Row(
                   children: <Widget>[
-                    new Expanded(
-                      child: new FlatButton(
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0),
-                        ),
-                        color: Colors.redAccent,
+                    Expanded(
+                      child: ElevatedButton(
                         onPressed: () {
                           navigateToStep1(context);
                         },
-                        child: new Container(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 20.0,
                             horizontal: 20.0,
                           ),
-                          child: Text(
+                          child: const Text(
                             "Continuar",
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -121,3 +133,6 @@ class _WelcomeState extends State<Welcome> {
     );
   }
 }
+
+
+

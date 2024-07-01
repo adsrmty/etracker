@@ -3,8 +3,21 @@ import 'Step2.dart';
 import 'Step1.dart';
 
 class Notice extends StatefulWidget {
+  const Notice({super.key, required this.title});
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
   @override
-  _NoticeState createState() => _NoticeState();
+  State<Notice> createState() => _NoticeState();
 }
 
 class _NoticeState extends State<Notice> {
@@ -15,14 +28,14 @@ class _NoticeState extends State<Notice> {
 
 
   Future navigateToStep1(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Step1(),
-      settings: RouteSettings(name: "/Step1"),
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const Step1(title: "Step1"),
+      settings: const RouteSettings(name: "/Step1"),
     ));
   }
 
   Future navigateToStep2(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Step2(),
-      settings: RouteSettings(name: "/Step2"),
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const Step2(title: "Step2"),
+      settings: const RouteSettings(name: "/Step2"),
     ));
   }
 
@@ -35,17 +48,17 @@ class _NoticeState extends State<Notice> {
           decoration: BoxDecoration(
             color: Colors.white,
             image: DecorationImage(
-              colorFilter: new ColorFilter.mode(
+              colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(0.1), BlendMode.dstATop),
-              image: AssetImage('assets/images/ninos2.jpg'),
+              image: const AssetImage('assets/images/ninos2.jpg'),
               fit: BoxFit.cover,
             ),
           ),
-          child: new Column(
+          child: Column(
             children: <Widget>[
               Container(
-                padding: EdgeInsets.all(40.0),
-                child: Center(
+                padding: const EdgeInsets.all(40.0),
+                child: const Center(
                   child: Icon(
                     Icons.headset_mic,
                     color: Colors.redAccent,
@@ -54,11 +67,11 @@ class _NoticeState extends State<Notice> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(bottom: 20.0),
-                child: new Row(
+                margin: const EdgeInsets.only(bottom: 20.0),
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    new Text(
+                    Text(
                       'AVISO',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -69,15 +82,15 @@ class _NoticeState extends State<Notice> {
                   ],
                 ),
               ),
-              new Row(
+              Row(
                 children: <Widget>[
-                  new Expanded(
-                    child: new Padding(
+                  Expanded(
+                    child: Padding(
                       padding: const EdgeInsets.only(left: 40.0, right: 40.0),
-                      child: new Text(
+                      child: Text(
                         WELCOME_MSG1,
                         textAlign: TextAlign.left,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 15.0,
                         ),
@@ -87,24 +100,23 @@ class _NoticeState extends State<Notice> {
                 ],
               ),
               Container(
-                margin: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 10.0),
-                child: new Row(
+                margin: const EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 10.0),
+                child: Row(
                   children: <Widget>[
-                    new Expanded(
-                      child: new FlatButton(
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0),
-                        ),
-                        color: Colors.redAccent,
+                    Expanded(
+                      child: ElevatedButton(
                         onPressed: (){
                           navigateToStep1(context);
                         },
-                        child: new Container(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 20.0,
                             horizontal: 20.0,
                           ),
-                          child: Text(
+                          child: const Text(
                             "Regresar",
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -120,24 +132,23 @@ class _NoticeState extends State<Notice> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 10.0),
-                child: new Row(
+                margin: const EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 10.0),
+                child: Row(
                   children: <Widget>[
-                    new Expanded(
-                      child: new FlatButton(
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0),
-                        ),
-                        color: Colors.redAccent,
+                    Expanded(
+                      child: ElevatedButton(
                         onPressed: (){
                           navigateToStep2(context);
                         },
-                        child: new Container(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 20.0,
                             horizontal: 20.0,
                           ),
-                          child: Text(
+                          child: const Text(
                             "Continuar",
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -159,3 +170,5 @@ class _NoticeState extends State<Notice> {
     );
   }
 }
+
+

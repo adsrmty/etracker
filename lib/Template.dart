@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:http/http.dart' as http;
 
 class Template extends StatefulWidget {
+  const Template({super.key, required this.title});
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
   @override
-  _TemplateState createState() => _TemplateState();
+  State<Template> createState() => _TemplateState();
 }
 
 class _TemplateState extends State<Template> {
@@ -20,16 +30,16 @@ class _TemplateState extends State<Template> {
           decoration: BoxDecoration(
             color: Colors.white,
             image: DecorationImage(
-              colorFilter: new ColorFilter.mode(
+              colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(0.1), BlendMode.dstATop),
-              image: AssetImage('assets/images/ninos2.jpg'),
+              image: const AssetImage('assets/images/ninos2.jpg'),
               fit: BoxFit.cover,
             ),
           ),
-          child: new Column(children: <Widget>[
+          child: Column(children: <Widget>[
             Container(
-              padding: EdgeInsets.all(40.0),
-              child: Center(
+              padding: const EdgeInsets.all(40.0),
+              child: const Center(
                 child: Icon(
                   Icons.headset_mic,
                   color: Colors.redAccent,
@@ -37,12 +47,12 @@ class _TemplateState extends State<Template> {
                 ),
               ),
             ),
-            new Row(
+            const Row(
               children: <Widget>[
-                new Expanded(
-                  child: new Padding(
+                Expanded(
+                  child: Padding(
                     padding: const EdgeInsets.only(left: 40.0),
-                    child: new Text(
+                    child: Text(
                       "Correo electrónico",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -54,12 +64,12 @@ class _TemplateState extends State<Template> {
                 ),
               ],
             ),
-            new Container(
+            Container(
               width: MediaQuery.of(context).size.width,
               margin: const EdgeInsets.only(
                   left: 40.0, right: 40.0, top: 0.0, bottom: 25.0),
               alignment: Alignment.center,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
                       color: Colors.redAccent,
@@ -68,16 +78,16 @@ class _TemplateState extends State<Template> {
                 ),
               ),
               padding: const EdgeInsets.only(left: 0.0, right: 10.0),
-              child: new Row(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  new Expanded(
+                  Expanded(
                     child: TextField(
                       obscureText: false,
                       controller: emailCtrl,
                       textAlign: TextAlign.left,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: 'JuanGonzalez@cambridgecollege.com',
                         hintStyle: TextStyle(color: Colors.grey),
@@ -93,3 +103,6 @@ class _TemplateState extends State<Template> {
     );
   }
 }
+
+
+

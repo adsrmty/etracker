@@ -1,10 +1,10 @@
 class CarList {
-  String color;
+  String color = "black";
 
-  CarList({this.color});
+  CarList({required this.color});
 
   String getSVGString(String carName) {
-    String svgContent;
+    String svgContent = "svgContent";
     switch (carName) {
       case 'SUV':
         {

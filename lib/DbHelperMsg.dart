@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'message.dart';
+import 'Message.dart';
 
 class DbHelperMsg {
   static final DbHelperMsg _instance = new DbHelperMsg.internal();
@@ -15,27 +15,18 @@ class DbHelperMsg {
   final String columnDate = 'date';
   final String columnMsg = 'msg';
 
-  static Database _db;
-
   DbHelperMsg.internal();
-
-  Future<Database> get getDb async {
-    if (_db == null) {
-      _db = await _initDb();
-    }
-    _createDbTable();
-    return _db;
-  }
-
-  Future<void> _createDbTable() async{
-    await _db.execute(
-        'CREATE TABLE IF NOT EXISTS $tableMsg($columnId INTEGER PRIMARY KEY, $columnDate TEXT, $columnMsg TEXT)');
-  }
+  static Database? _db;
+  Future<Database> get getDb async =>
+      _db ??= await _initDb();
 
   _initDb() async {
+    print('initDb()');
     String databasesPath = await getDatabasesPath();
     String path = join(databasesPath, databaseName);
     var db = await openDatabase(path, version: 1, onCreate: _onCreate);
+    await db.execute(
+        'CREATE TABLE IF NOT EXISTS $tableMsg($columnId INTEGER PRIMARY KEY, $columnDate TEXT, $columnMsg TEXT)');
     return db;
   }
 
@@ -56,23 +47,24 @@ class DbHelperMsg {
     return result.toList();
   }
 
-  Future<int> getCount() async {
+  Future<int?> getCount() async {
     var dbClient = await getDb;
     return Sqflite.firstIntValue(await dbClient.rawQuery('SELECT COUNT(*) FROM $tableMsg'));
   }
 
   Future<Message> getMsg(int id) async {
     var dbClient = await getDb;
-    List<Map> result = await dbClient.query(tableMsg,
+    List<Map<String, dynamic>> result = await dbClient.query(tableMsg,
         columns: [columnId, columnDate, columnMsg],
         where: '$columnId = ?',
         whereArgs: [id]);
 
-    if (result.length > 0) {
-      return new Message.fromMap(result.first);
+    if (result.isNotEmpty) {
+      return Message.fromMap(result.first);
     }
-
-    return null;
+    else {
+      return Message ("Default","Default");
+    }
   }
 
   Future<int> deleteMsg(int id) async {
@@ -86,8 +78,8 @@ class DbHelperMsg {
   }
 
   Future<void> clearTableContents() async {
-    await _db.execute(
-        'DELETE FROM ${tableMsg}');
+    await _db?.execute(
+        'DELETE FROM $tableMsg');
   }
 
   Future<void> deleteDb() async {

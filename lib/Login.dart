@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter_login_screens/students.dart';
-import 'package:flutter_login_screens/VehicleSettings.dart';
+import 'package:etracker/students.dart';
+import 'package:etracker/VehicleSettings.dart';
 import 'package:http/http.dart';
 import 'SignUp.dart';
 import 'Welcome.dart';
@@ -9,31 +9,26 @@ import 'RecoverPassword.dart';
 import 'SecureStorage.dart';
 import 'SharedPreferencesHelper.dart';
 import 'DbHelperStudent.dart';
-import 'dart:convert';
-
-/*class Login extends StatelessWidget {
-  String screenFrom;
-  Login ({this.screenFrom});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: '/',
-      routes: {
-        '/': (context) => SubLogin(screenFrom: this.screenFrom),
-        '/Students': (context) => Students(),
-      },
-    );
-  }
-}*/
+import 'student.dart';
+import 'Status.dart';
 
 class Login extends StatefulWidget {
-  String screenToGo;
+  const Login({super.key, required this.title, required this.screenToGo});
 
-  Login({this.screenToGo});
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+  final String screenToGo;
 
   @override
-  _LoginState createState() => _LoginState();
+  State<Login> createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
@@ -48,14 +43,17 @@ class _LoginState extends State<Login> {
       ' de Privacidad es informarte sobre qué datos recogemos, por qué los recogemos'
       ' y cómo puedes actualizarlos, gestionarlos, exportarlos y eliminarlos.';
   final int RESULT_STATUS = 1;
+  final int ADMIN_STATUS = 2;
+  DbHelperStudent _db = DbHelperStudent();
   final SecureStorage secureStorage = SecureStorage();
+  bool _isButtonDisabled = true;
 
   Future navigateToWelcome(context) async {
     Navigator.pop(context);
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Welcome(),
+          builder: (context) => const Welcome(title: "Welcome"),
           settings: RouteSettings(name: "/Welcome"),
         ));
   }
@@ -65,8 +63,18 @@ class _LoginState extends State<Login> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Students(),
+          builder: (context) => const Students(title: "Students"),
           settings: RouteSettings(name: "/Students"),
+        ));
+  }
+
+  Future navigateToStatus(context) async {
+    Navigator.pop(context);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Status(title: "Status"),
+          settings: RouteSettings(name: "/Status"),
         ));
   }
 
@@ -75,8 +83,18 @@ class _LoginState extends State<Login> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => VehicleSettings(),
+          builder: (context) => const VehicleSettings(title: "VehicleSettings"),
           settings: RouteSettings(name: "/VehicleSettings"),
+        ));
+  }
+
+  Future navigateToSetReferencePoint(context) async {
+    Navigator.pop(context);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const VehicleSettings(title: "VehicleSettings"),
+          settings: RouteSettings(name: "/SetReferencePoint"),
         ));
   }
 
@@ -87,33 +105,89 @@ class _LoginState extends State<Login> {
     super.dispose();
   }
 
-  Future<void> _login(String screenFrom) async {
+  Future<void> _login(String screenToGo) async {
+    DbHelperStudent _db = DbHelperStudent();
+    // Debug, remove below row.
+    _db.deleteDb();
+    navigateToWelcome(context);
+    /*
     print('User=' + emailCtrl.text + ' password=' + passwordCtrl.text);
     var map = Map<String, dynamic>();
     map['action'] = 'login';
     map['input1'] = emailCtrl.text;
     map['input2'] = passwordCtrl.text;
-    Response response = await post(WEBPAGE, body: map);
+    Response response = await post(Uri.parse(WEBPAGE), body: map);
     print("Response: " + response.body);
     var list = response.body.split(",");
-    if (!response.body.contains("Error")) {
-      DbHelperStudent _db = new DbHelperStudent();
-      _db.deleteDb();
+    if (response.body.contains("Error")) {
       print("Login Success!!!");
-      print("screen= " + screenFrom);
-      //secureStorage.writeSecureData('email', emailCtrl.text );
+
+      DbHelperStudent _db = DbHelperStudent();
+
+      // Debug, remove below row.
+      _db.deleteDb();
+
+      //print("response.body= " + response.body);
+      //print("list[$RESULT_STATUS]= " + list[RESULT_STATUS]);
+      //print("list[$ADMIN_STATUS]= " + list[ADMIN_STATUS]);
+      //print("screen= " + screenToGo);
+
+      //if (list[ADMIN_STATUS] == 'admin') {
+      secureStorage.writeSecureData('admin', '2tr1ck2r');
+      //} else {
+      //  secureStorage.writeSecureData('admin', 'false');
+      //}
+
       SharedPreferencesHelper.setEmail(emailCtrl.text);
-      if (screenFrom == '/Welcome') {
+
+      if (screenToGo == '/Status') {
+        navigateToStatus(context);
+      } else if (screenToGo == '/Welcome') {
         navigateToWelcome(context);
-      } else if (screenFrom == '/Students') {
+      } else if (screenToGo == '/Students') {
         navigateToStudents(context);
-      } else if (screenFrom == '/VehicleSettings') {
+      } else if (screenToGo == '/VehicleSettings') {
+        navigateToVehicleSettings(context);
+      } else if (screenToGo == '/SetReferencePoint') {
         navigateToVehicleSettings(context);
       }
     } else {
-      print("Error = " + list[RESULT_STATUS + 1]);
-      _showDialog('Error', list[RESULT_STATUS+1]);
+      print("RESULT_STATUS = $RESULT_STATUS");
+      print("Error = " + list[RESULT_STATUS]);
+      _showDialog('Error', list[RESULT_STATUS]);
     }
+    */
+
+  }
+
+  Future<int> _checkPickupKeys() async {
+    List<Student> students = List<Student>.empty();
+    List list = await _db.getAllStudents();
+    list.forEach((item) {
+      print('printing item map');
+      print(item['id']);
+      print(item['name']);
+      print(item['school']);
+      print(item['schedule']);
+      print(item['expire']);
+
+      var now = DateTime.now();
+
+      int year = int.parse("20" + item['expire'].substring(0, 2));
+      int month = int.parse(item['expire'].substring(2, 4));
+      int day = int.parse(item['expire'].substring(4, 6));
+      var newDate = DateTime(year, month, day, 23, 59, 00);
+
+      // date received is greater than current day that means expiration date is in the future
+      print("compare to= " + newDate.compareTo(now).toString());
+      if (newDate.compareTo(now) > 0) {
+        students.add(Student.fromMap(item));
+      } else {
+        _db.deleteStudent(item['id']);
+      }
+    });
+    print("_students length= ${students.length}");
+    return students.length;
   }
 
   void _showDialog(String title, String msg) {
@@ -123,12 +197,12 @@ class _LoginState extends State<Login> {
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text(title),
-          content: new Text(msg),
+          title: Text(title),
+          content: Text(msg),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Close"),
+            TextButton(
+              child: const Text("Close"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -141,11 +215,15 @@ class _LoginState extends State<Login> {
 
   Future navigateToRecoverPassword(context) async {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => RecoverPassword()));
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                const RecoverPassword(title: "RecoverPassword")));
   }
 
   Future navigateToSignUp(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SignUp()));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const SignUp(title: "SignUp")));
   }
 
   @override
@@ -156,17 +234,17 @@ class _LoginState extends State<Login> {
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
             image: DecorationImage(
-              colorFilter: new ColorFilter.mode(
+              colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(0.1), BlendMode.dstATop),
               image: AssetImage('assets/images/ninos2.jpg'),
               fit: BoxFit.cover,
             ),
           ),
-          child: new Column(
+          child: Column(
             children: <Widget>[
               Container(
-                padding: EdgeInsets.all(60.0),
-                child: Center(
+                padding: const EdgeInsets.all(60.0),
+                child: const Center(
                   child: Icon(
                     Icons.headset_mic,
                     color: Colors.redAccent,
@@ -174,12 +252,12 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              new Row(
+              const Row(
                 children: <Widget>[
-                  new Expanded(
-                    child: new Padding(
-                      padding: const EdgeInsets.only(left: 40.0),
-                      child: new Text(
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 40.0),
+                      child: Text(
                         "Correo electrónico",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -191,12 +269,12 @@ class _LoginState extends State<Login> {
                   ),
                 ],
               ),
-              new Container(
+              Container(
                 width: MediaQuery.of(context).size.width,
                 margin:
                     const EdgeInsets.only(left: 40.0, right: 40.0, top: 10.0),
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
                         color: Colors.redAccent,
@@ -205,16 +283,16 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 padding: const EdgeInsets.only(left: 0.0, right: 10.0),
-                child: new Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    new Expanded(
+                    Expanded(
                       child: TextField(
                         obscureText: false,
                         textAlign: TextAlign.left,
                         controller: emailCtrl,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: 'JuanGozalez@cambridgecollege.com',
                           hintStyle: TextStyle(color: Colors.grey),
@@ -224,15 +302,15 @@ class _LoginState extends State<Login> {
                   ],
                 ),
               ),
-              Divider(
+              const Divider(
                 height: 24.0,
               ),
-              new Row(
+              const Row(
                 children: <Widget>[
-                  new Expanded(
-                    child: new Padding(
-                      padding: const EdgeInsets.only(left: 40.0),
-                      child: new Text(
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 40.0),
+                      child: Text(
                         "Contraseña",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -244,12 +322,12 @@ class _LoginState extends State<Login> {
                   ),
                 ],
               ),
-              new Container(
+              Container(
                 width: MediaQuery.of(context).size.width,
                 margin:
                     const EdgeInsets.only(left: 40.0, right: 40.0, top: 10.0),
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
                         color: Colors.redAccent,
@@ -258,16 +336,16 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 padding: const EdgeInsets.only(left: 0.0, right: 10.0),
-                child: new Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    new Expanded(
+                    Expanded(
                       child: TextField(
                         controller: passwordCtrl,
                         obscureText: true,
                         textAlign: TextAlign.left,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: '*********',
                           hintStyle: TextStyle(color: Colors.grey),
@@ -277,15 +355,15 @@ class _LoginState extends State<Login> {
                   ],
                 ),
               ),
-              new Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Container(
                     height: 50.0,
                     padding:
                         const EdgeInsets.only(right: 20.0, top: 0, bottom: 0),
-                    child: new FlatButton(
-                      child: new Text(
+                    child: TextButton(
+                      child: const Text(
                         "Olvidaste tu contraseña?",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -299,14 +377,14 @@ class _LoginState extends State<Login> {
                   ),
                 ],
               ),
-              new Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Container(
                     height: 50.0,
                     padding: const EdgeInsets.only(right: 20.0),
-                    child: new FlatButton(
-                      child: new Text(
+                    child: TextButton(
+                      child: const Text(
                         "No tienes cuenta?",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -325,19 +403,19 @@ class _LoginState extends State<Login> {
               Container(
                 margin:
                     const EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
-                child: new RichText(
+                child: RichText(
                   textAlign: TextAlign.center,
-                  text: new TextSpan(
+                  text: TextSpan(
                     children: [
-                      new TextSpan(
+                      const TextSpan(
                         text: 'Al ingresar, aceptas nuestros ',
-                        style: new TextStyle(color: Colors.black),
+                        style: TextStyle(color: Colors.black),
                       ),
-                      new TextSpan(
+                      TextSpan(
                         text: 'Términos y Politica de Privacidad',
-                        style: new TextStyle(
+                        style: const TextStyle(
                             fontWeight: FontWeight.bold, color: Colors.blue),
-                        recognizer: new TapGestureRecognizer()
+                        recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             //launch('https://www.gmail.com ');
                             _showDialog('Términos y Políticas de Privacidad',
@@ -348,28 +426,30 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              new Container(
+              Container(
                 width: MediaQuery.of(context).size.width,
                 margin:
                     const EdgeInsets.only(left: 30.0, right: 30.0, top: 40.0),
                 alignment: Alignment.center,
-                child: new Row(
+                child: Row(
                   children: <Widget>[
-                    new Expanded(
-                      child: new FlatButton(
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: passwordCtrl.text.isNotEmpty &&
+                                passwordCtrl.text.isNotEmpty
+                            ? () {
+                                _login(widget.screenToGo);
+                              }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
                         ),
-                        color: Colors.redAccent,
-                        onPressed: () {
-                          _login(widget.screenToGo);
-                        },
-                        child: new Container(
+                        child: Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 20.0,
                             horizontal: 20.0,
                           ),
-                          child: Text(
+                          child: const Text(
                             "Ingresar",
                             textAlign: TextAlign.center,
                             style: TextStyle(

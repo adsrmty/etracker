@@ -1,42 +1,59 @@
 import 'package:flutter/material.dart';
 import 'Login.dart';
-import 'messages.dart';
+import 'Messages.dart';
 import 'students.dart';
+import 'SecureStorage.dart';
+import 'SetReferencePoint.dart';
 
 class NavDrawer extends StatelessWidget {
-  static String screenToGo;
-  bool admin = true;
+  static String screenToGo = "screenToGo";
+  final SecureStorage secureStorage = SecureStorage();
+  String admin = "admin";
 
   static Future navigateToLogin(context) async {
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => Login(
-                  screenToGo: screenToGo,
-                )));
+              title: "Login",
+              screenToGo: screenToGo,
+            )));
   }
 
   static Future navigateToStudents(context) async {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => Students()));
+        context, MaterialPageRoute(builder: (context) => const Students(title: "Students")));
   }
 
   static Future navigateToMessages(context) async {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Messages(),
+        builder: (context) => const Messages(title: "Messages"),
       ),
     );
   }
 
+  Future<String> getAdminStatus() async {
+    admin = await secureStorage.readSecureData('admin');
+    return admin;
+  }
+
   @override
   Widget build(BuildContext context) {
-    Widget widget;
-    admin ? widget = AdminDrawer() : widget = UserDrawer();
-    return widget;
+    return FutureBuilder<String>(
+        future: getAdminStatus(),
+        builder: (context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data == '2tr1ck2r') {
+              return AdminDrawer();
+            } else {
+              return UserDrawer();
+            }
+          } else {
+            return CircularProgressIndicator();
+          }
+        });
   }
 }
 
@@ -56,12 +73,16 @@ class AdminDrawer extends StatelessWidget {
                 color: Colors.green,
                 image: DecorationImage(
                     fit: BoxFit.fill,
-                    image: AssetImage('assets/images/cover.jpg'))),
+                    image: AssetImage('assets/images/mountains.jpg'))),
           ),
           ListTile(
             leading: Icon(Icons.input),
-            title: Text('Administración'),
-            onTap: () => {},
+            title: Text('Fijar punto de referencia'),
+            onTap: () {
+              Navigator.pop(context);
+              NavDrawer.screenToGo = '/SetReferencePoint';
+              NavDrawer.navigateToLogin(context);
+            },
           ),
           ListTile(
             leading: Icon(Icons.input),
@@ -77,7 +98,7 @@ class AdminDrawer extends StatelessWidget {
             leading: Icon(Icons.input),
             title: Text('Mensajes'),
             onTap: () {
-            NavDrawer.navigateToMessages(context);
+              NavDrawer.navigateToMessages(context);
             },
           ),
           ListTile(
@@ -136,7 +157,10 @@ class UserDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.input),
             title: Text('Alumnos'),
-            onTap: () => {},
+            onTap: () {
+              Navigator.pop(context);
+              NavDrawer.navigateToStudents(context);
+            },
           ),
           ListTile(
             leading: Icon(Icons.input),
@@ -176,3 +200,7 @@ class UserDrawer extends StatelessWidget {
     );
   }
 }
+
+
+
+

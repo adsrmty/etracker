@@ -8,10 +8,24 @@ import 'package:http/http.dart';
 import 'Step2.dart';
 import 'Notice.dart';
 import 'CarList.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class Step1 extends StatefulWidget {
+  const Step1({super.key, required this.title});
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
   @override
-  _Step1State createState() => _Step1State();
+  State<Step1> createState() => _Step1State();
 }
 
 class _Step1State extends State<Step1> {
@@ -20,14 +34,13 @@ class _Step1State extends State<Step1> {
   final int RESULT_STATUS = 1;
 
   List _cars = [
-    "SUV",
-    "SUV Grande",
-    "Van",
-    "Sedan",
-    "Camioneta",
-    "Hatchback",
     "Mini",
-    "Minivan"
+    "Convertible",
+    "Sport",
+    "Sedan",
+    "Suv",
+    "Minivan",
+    "Pickup"
   ];
 
   List _colors = [
@@ -43,21 +56,30 @@ class _Step1State extends State<Step1> {
     'Amarillo'
   ];
 
-  List<DropdownMenuItem<String>> _dropDownCarItems;
-  List<DropdownMenuItem<String>> _dropDownColorItems;
-  String _selectedCar;
-  Color _selectedColor = Colors.black;
-  bool _isButtonDisabled;
-  var _map = new Map<String, Picture>();
+  List<DropdownMenuItem<String>> _dropDownCarItems =
+      List<DropdownMenuItem<String>>.empty();
+  String _selectedCar = "Sedan";
+
+  bool _isButtonDisabled = true;
+  var _map = Map<String, Picture>();
 
   // Use temp variable to only update color when press dialog 'submit' button
-  Color _tempMainColor;
+  ColorSwatch _tempMainColor = Colors.blue;
+  ColorSwatch _selectedColor = Colors.green;
 
   @override
   void initState() {
     _dropDownCarItems = _getDropDownCarItems();
-    _isButtonDisabled = true;
-    _decodeSvgPictures();
+    for (var i = 0; i < _dropDownCarItems.length; i++) {
+      print("value= ${_dropDownCarItems[i].value}");
+      print("key= ${_dropDownCarItems[i].key}");
+    }
+    //print(_dropDownCarItems.fir);
+    if (_selectedCar != null && _selectedColor != null) {
+      _isButtonDisabled = false;
+    } else {
+      _isButtonDisabled = true;
+    }
     super.initState();
   }
 
@@ -65,8 +87,8 @@ class _Step1State extends State<Step1> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Notice(),
-          settings: RouteSettings(name: "/Notice"),
+          builder: (context) => const Notice(title: "Notice"),
+          settings: const RouteSettings(name: "/Notice"),
         ));
   }
 
@@ -79,7 +101,7 @@ class _Step1State extends State<Step1> {
       Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Step2(),
+            builder: (context) => const Step2(title: "Step2"),
             settings: RouteSettings(name: "/Step2"),
           ));
     }
@@ -93,11 +115,11 @@ class _Step1State extends State<Step1> {
     map['action'] = 'setUserInfo';
     map['input1'] = email;
     map['input2'] = _selectedCar;
-    map['input3'] = _selectedColor.value.toRadixString(16);
+    map['input3'] = _selectedColor!.value.toRadixString(16);
     map['input4'] = plateCtrl.text;
 
     Response response = await post(
-      WEBPAGE2,
+      Uri.parse(WEBPAGE2),
       /*headers: <String, String>{
         //'Content-Type': 'application/json; charset=UTF-8',
         'Content-Type': 'application/text; charset=UTF-8',
@@ -115,53 +137,46 @@ class _Step1State extends State<Step1> {
     }
   }
 
-  Future<void> _decodeSvgPictures() async {
-    String colorString = _selectedColor.toString();
-    String valueString = colorString.split('(0x')[1].substring(0, 5);
-    print('valueString= ' + valueString);
-    CarList car = new CarList(color: valueString);
-
-    for (String carName in _cars) {
-      final String rawSvg = car.getSVGString(carName);
-      final DrawableRoot svgRoot = await svg.fromSvgString(rawSvg, rawSvg);
-      _map[carName] = svgRoot.toPicture();
-    }
-  }
-
   List<DropdownMenuItem<String>> _getDropDownCarItems() {
-    List<DropdownMenuItem<String>> items = new List();
+    print("_getDropDownCarItems");
+    List<DropdownMenuItem<String>> items =
+        List<DropdownMenuItem<String>>.empty(growable: true);
 
     String colorString = _selectedColor.toString();
     String valueString = colorString.split('(0xff')[1].substring(0, 6);
     print('valueString= ' + valueString);
-    CarList car = new CarList(color: valueString);
+    CarList car = CarList(color: valueString);
 
     for (String carName in _cars) {
+      print("carName= $carName");
       String assetName = _getAssetName(carName);
+      print("assetName= $assetName");
+      print("_selectedColor= ${_selectedColor.toString()}");
       items.add(
-        new DropdownMenuItem(
+        DropdownMenuItem(
           value: carName,
-          child: new Container(
-            padding: EdgeInsets.fromLTRB(0.0, 10.0, 0, 10.0),
-            child: new Row(
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0, 10.0),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Container(
                   //margin: EdgeInsets.only(right: 20),
-                  padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+                  padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
                   decoration: BoxDecoration(
                       border: Border.all(
-                        color: Colors.black,
+                        color: Colors.red,
                       ),
-                      color: changeBackGround(_selectedColor),
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
-                  child: SvgPicture.asset(
-                    assetName,
-                    semanticsLabel: 'Acme Logo',
-                    width: 100,
-                    height: 80,
-                    color: _selectedColor,
-                  ),
+                      color: Colors.black, //changeBackGround(_selectedColor),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(20))),
+                  child: SvgPicture.asset(assetName,
+                      semanticsLabel: 'Acme Logo',
+                      width: 100,
+                      height: 80,
+                      //color: _selectedColor),
+                      colorFilter:
+                          ColorFilter.mode(_selectedColor!, BlendMode.srcIn)),
                 ),
                 Expanded(
                   flex: 1,
@@ -180,42 +195,31 @@ class _Step1State extends State<Step1> {
   }
 
   String _getAssetName(String carName) {
-    String assetName;
+    String assetName = 'assets/images/mamamovilGris.svg';
 
-    switch (carName) {
-      case "SUV":
-        assetName = 'assets/images/mamamovilGris.svg';
-        //assetName = 'assets/images/suv.svg';
+    /*   switch (carName) {
+      case "Mini":
+        assetName = 'assets/images/mini.svg';
         break;
-      case "SUV Grande":
-        assetName = 'assets/images/mamamovilGris.svg';
-        //assetName = 'assets/images/suvGrande.svg';
+      case "Convertible":
+        assetName = 'assets/images/convertible.svg';
         break;
-      case "Van":
-        assetName = 'assets/images/mamamovilGris.svg';
-        //assetName = 'assets/images/van.svg';
+      case "Sport":
+        assetName = 'assets/images/sport.svg';
         break;
       case "Sedan":
-        assetName = 'assets/images/mamamovilGris.svg';
-        //assetName = 'assets/images/sedan.svg';
+        assetName = 'assets/images/sedan.svg';
         break;
-      case "Camioneta":
-        assetName = 'assets/images/mamamovilGris.svg';
-        //assetName = 'assets/images/camioneta.svg';
-        break;
-      case "Hatchback":
-        assetName = 'assets/images/mamamovilGris.svg';
-        //assetName = 'assets/images/hatchback.svg';
-        break;
-      case "Mini":
-        assetName = 'assets/images/mamamovilGris.svg';
-        //assetName = 'assets/images/mini.svg';
+      case "Suv":
+        assetName = 'assets/images/suv.svg';
         break;
       case "Minivan":
-        assetName = 'assets/images/mamamovilGris.svg';
-        //assetName = 'assets/images/minivan.svg';
+        assetName = 'assets/images/minivan.svg';
         break;
-    }
+      case "Pickup":
+        assetName = 'assets/images/pickup.svg';
+        break;
+    }*/
     return assetName;
   }
 
@@ -228,9 +232,9 @@ class _Step1State extends State<Step1> {
       return Colors.white;
   }
 
-  void changedDropDownCarItem(String selectedCar) {
+  void changedDropDownCarItem(String? selectedCar) {
     setState(() {
-      _selectedCar = selectedCar;
+      _selectedCar = selectedCar!;
 
       if (_selectedCar != null && _selectedColor != null) {
         _isButtonDisabled = false;
@@ -288,19 +292,28 @@ class _Step1State extends State<Step1> {
           title: Text(title),
           content: content,
           actions: [
-            TextButton(
-              child: Text('CANCEL'),
+            ElevatedButton(
+              child: const Text('CANCEL'),
               onPressed: Navigator.of(context).pop,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
             ),
-            TextButton(
-              child: Text('SUBMIT'),
+            ElevatedButton(
+              child: const Text('SUBMIT'),
               onPressed: () {
                 Navigator.of(context).pop();
                 setState(() {
+                  print("_tempMainColor = $_tempMainColor");
                   _selectedColor = _tempMainColor;
                   _dropDownCarItems = _getDropDownCarItems();
                 });
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
             ),
           ],
         );
@@ -316,9 +329,7 @@ class _Step1State extends State<Step1> {
         child: MaterialColorPicker(
           selectedColor: _selectedColor,
           colors: [
-            Colors.black,
             Colors.blue,
-            Colors.white,
             Colors.brown,
             Colors.grey,
             Colors.green,
@@ -328,9 +339,9 @@ class _Step1State extends State<Step1> {
             Colors.yellow,
           ],
           allowShades: false,
-          onMainColorChange: (Color color) => setState(() {
+          onMainColorChange: (color) => setState(() {
             print('El color seleccionado es: ${color.toString()}');
-            _tempMainColor = color;
+            _tempMainColor = color!;
           }),
           onBack: () => print("Back button pressed"),
         ),
@@ -347,17 +358,17 @@ class _Step1State extends State<Step1> {
           decoration: BoxDecoration(
             color: Colors.white,
             image: DecorationImage(
-              colorFilter: new ColorFilter.mode(
+              colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(0.1), BlendMode.dstATop),
-              image: AssetImage('assets/images/ninos2.jpg'),
+              image: const AssetImage('assets/images/ninos2.jpg'),
               fit: BoxFit.cover,
             ),
           ),
-          child: new Column(
+          child: Column(
             children: <Widget>[
               Container(
-                padding: EdgeInsets.all(40.0),
-                child: Center(
+                padding: const EdgeInsets.all(40.0),
+                child: const Center(
                   child: Icon(
                     Icons.headset_mic,
                     color: Colors.redAccent,
@@ -366,11 +377,11 @@ class _Step1State extends State<Step1> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(bottom: 20.0),
-                child: new Row(
+                margin: const EdgeInsets.only(bottom: 20.0),
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    new Text(
+                    Text(
                       'PASO 1',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -383,10 +394,10 @@ class _Step1State extends State<Step1> {
               ),
               Container(
                 margin: EdgeInsets.only(bottom: 0.0),
-                child: new Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    new Text(
+                    Text(
                       'Información básica de tu vehículo.',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -402,7 +413,7 @@ class _Step1State extends State<Step1> {
                 margin: const EdgeInsets.only(
                     left: 40.0, right: 40.0, top: 20.0, bottom: 0.0),
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
                         color: Colors.black,
@@ -411,11 +422,11 @@ class _Step1State extends State<Step1> {
                   ),
                 ),
                 padding: const EdgeInsets.only(left: 0.0, right: 10.0),
-                child: new Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    new Expanded(
+                    Expanded(
                       child: TextField(
                         obscureText: false,
                         controller: plateCtrl,
@@ -424,7 +435,7 @@ class _Step1State extends State<Step1> {
                         },
                         textAlign: TextAlign.left,
                         maxLength: 3,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Escribe los últimos 3 dígitos tus placas',
                         ),
                       ),
@@ -435,15 +446,15 @@ class _Step1State extends State<Step1> {
               Container(
                 margin: const EdgeInsets.only(top: 00.0, bottom: 0.0),
                 padding: const EdgeInsets.only(left: 40.0, right: 40.0),
-                child: new DropdownButtonFormField(
-                  itemHeight: 100,
+                child: DropdownButtonFormField(
+                  itemHeight: 150,
                   isDense: false,
-                  hint: Text('Seleccione el tipo del vehículo'),
+                  hint: const Text('Seleccione el tipo del vehículo'),
                   value: _selectedCar,
                   isExpanded: true,
                   items: _dropDownCarItems,
                   onChanged: changedDropDownCarItem,
-                  style: new TextStyle(
+                  style: const TextStyle(
                     fontSize: 15,
                     color: Colors.black,
                   ),
@@ -454,7 +465,7 @@ class _Step1State extends State<Step1> {
                 margin: const EdgeInsets.only(
                     left: 40.0, right: 40.0, top: 20.0, bottom: 0.0),
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
                         color: Colors.black,
@@ -464,7 +475,7 @@ class _Step1State extends State<Step1> {
                 ),
                 padding: const EdgeInsets.only(left: 0.0, right: 10.0),
                 child: Container(
-                  margin: EdgeInsets.only(bottom: 20.0),
+                  margin: const EdgeInsets.only(bottom: 20.0),
                   child: InkWell(
                     onTap: () {
                       _openColorPicker();
@@ -479,13 +490,13 @@ class _Step1State extends State<Step1> {
                               border: Border.all(),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
-                          margin: EdgeInsets.only(right: 12.0),
-                          child: SizedBox(
+                          margin: const EdgeInsets.only(right: 12.0),
+                          child: const SizedBox(
                             width: 60.0,
                             height: 30.0,
                           ),
                         ),
-                        Expanded(
+                        const Expanded(
                           child: Text(
                             "Da click aquí para seleccionar el color de tu vehículo",
                             style: TextStyle(color: Colors.black54),
@@ -499,26 +510,24 @@ class _Step1State extends State<Step1> {
               ),
               Container(
                 margin: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 10.0),
-                child: new Row(
+                child: Row(
                   children: <Widget>[
-                    new Expanded(
-                      child: new FlatButton(
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0),
-                        ),
-                        color: Colors.redAccent,
-                        disabledColor: Colors.grey,
+                    Expanded(
+                      child: ElevatedButton(
                         onPressed: _isButtonDisabled
                             ? null
                             : () {
                                 navigateToStep2(context);
                               },
-                        child: new Container(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 20.0,
                             horizontal: 20.0,
                           ),
-                          child: Text(
+                          child: const Text(
                             "Continuar",
                             textAlign: TextAlign.center,
                             style: TextStyle(

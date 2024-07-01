@@ -12,9 +12,9 @@ class SharedPreferencesHelper {
   /// ------------------------------------------------------------
   ///
   /// ------------------------------------------------------------
-  static Future <String> getCarType(){
+  static Future<String> getCarType () async{
     final EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
-    return prefs.getString(_carType) ?? 'Sedan';
+    return await prefs.getString(_carType) ?? 'Sedan';
   }
 
   /// ----------------------------------------------------------
@@ -28,10 +28,10 @@ class SharedPreferencesHelper {
   /// ------------------------------------------------------------
   ///
   /// ------------------------------------------------------------
-  static Future <String> getEmail(){
+  static Future<String> getEmail() async{
     final EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
     Future <SharedPreferences> pref= prefs.getInstance();
-    return prefs.getString(_email) ?? 'Error';
+    return await prefs.getString(_email) ?? 'Error';
   }
 
   /// ----------------------------------------------------------
@@ -50,7 +50,7 @@ class SharedPreferencesHelper {
     final EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
     String colorString= await prefs.getString(_carColor) ?? 'FFFFFFFF';
     int value = int.parse(colorString, radix: 16);
-    return new Color(value);
+    return Color(value);
   }
 
   /// ----------------------------------------------------------
@@ -67,9 +67,9 @@ class SharedPreferencesHelper {
   /// ------------------------------------------------------------
   ///
   /// ------------------------------------------------------------
-  static Future<String> getCarPlate(){
+  static Future<String> getCarPlate() async{
     final EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
-    return prefs.getString(_carPlate) ?? 'Sedan';
+    return await prefs.getString(_carPlate) ?? 'Sedan';
   }
 
   /// ----------------------------------------------------------

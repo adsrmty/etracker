@@ -3,7 +3,7 @@ class User {
   String lastName;
   String time;
 
-  User({this.firstName, this.lastName, this.time});
+  User({required this.firstName, required this.lastName, required this.time});
 
   static List<User> getUsers() {
     return <User>[

@@ -7,8 +7,21 @@ import 'Status.dart';
 import 'SecureStorage.dart';
 
 class Step2 extends StatefulWidget {
+  const Step2({super.key, required this.title});
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
   @override
-  _Step2State createState() => _Step2State();
+  State<Step2> createState() => _Step2State();
 }
 
 class _Step2State extends State<Step2> {
@@ -16,21 +29,24 @@ class _Step2State extends State<Step2> {
   bool photo = false;
   final String ADD_PHOTO_MSG =
       'De click aquí para agregar su fotografía tipo pasaporte. Esta fotografía será la que verán los maestros cuando usted recoja al alumno(a).';
-  File file;
+
+  //File file = File("");
+  File? file;
   final SecureStorage secureStorage = SecureStorage();
 
   Future navigateToNotice2(context) async {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Notice2(),
-          settings: RouteSettings(name: "/Notice2"),
+          builder: (context) => const Notice2(title: ""),
+          settings: const RouteSettings(name: "/Notice2"),
         ));
   }
 
   Future navigateToStep3(context) async {
     if (photo == true) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Step3()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const Step3(title: "Step3")));
     } else {
       navigateToNotice2(context);
     }
@@ -40,33 +56,33 @@ class _Step2State extends State<Step2> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Status(),
-          settings: RouteSettings(name: "/Status"),
+          builder: (context) => const Status(title: "Status"),
+          settings: const RouteSettings(name: "/Status"),
         ));
     //Navigator.pushNamedAndRemoveUntil(context, '/Status',  ModalRoute.withName('/Step1'));
   }
 
   void _getPicture() async {
-    print("_getPicture");
-    file = await FilePicker.getFile();
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      File file = File(result.files.single.path!);
+    }
     setState(() {
       if (!photo) photo = !photo;
     });
   }
 
   Image showPicture() {
-    Image image;
-    if (file != null && file.exists() == true)
-      image = Image.asset(
-        '',
-        fit: BoxFit.fill,
-      );
-    else
-      image = Image.asset(
-        'assets/images/Han.jpg',
-        fit: BoxFit.fill,
-      );
-    return image;
+    Image? image;
+    if (file != null) {
+      if (file!.exists() == Future.value(true)) {
+        image = Image.asset('', fit: BoxFit.fill);
+      }
+    } else {
+      image = Image.asset('assets/images/Han.jpg',fit: BoxFit.fill);
+    }
+    return image!;
   }
 
   @override
@@ -78,17 +94,17 @@ class _Step2State extends State<Step2> {
           decoration: BoxDecoration(
             color: Colors.white,
             image: DecorationImage(
-              colorFilter: new ColorFilter.mode(
+              colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(0.1), BlendMode.dstATop),
-              image: AssetImage('assets/images/ninos2.jpg'),
+              image: const AssetImage('assets/images/ninos2.jpg'),
               fit: BoxFit.cover,
             ),
           ),
-          child: new Column(
+          child: Column(
             children: <Widget>[
               Container(
-                padding: EdgeInsets.all(20.0),
-                child: Center(
+                padding: const EdgeInsets.all(20.0),
+                child: const Center(
                   child: Icon(
                     Icons.headset_mic,
                     color: Colors.redAccent,
@@ -97,11 +113,11 @@ class _Step2State extends State<Step2> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(bottom: 20.0),
-                child: new Row(
+                margin: const EdgeInsets.only(bottom: 20.0),
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    new Text(
+                    Text(
                       'PASO 2',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -113,11 +129,11 @@ class _Step2State extends State<Step2> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(bottom: 0.0),
-                child: new Row(
+                margin: const EdgeInsets.only(bottom: 0.0),
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    new Text(
+                    Text(
                       'Fotografía del conductor',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -130,9 +146,9 @@ class _Step2State extends State<Step2> {
               ),
               Container(
                 padding: photo
-                    ? EdgeInsets.all(0)
-                    : EdgeInsets.only(left: 10.0, right: 10.0),
-                margin: EdgeInsets.only(
+                    ? const EdgeInsets.all(0)
+                    : const EdgeInsets.only(left: 10.0, right: 10.0),
+                margin: const EdgeInsets.only(
                     left: 90.0, right: 90.0, top: 20.0, bottom: 20.0),
                 decoration: BoxDecoration(
                   border: Border.all(),
@@ -150,23 +166,22 @@ class _Step2State extends State<Step2> {
               ),
               Container(
                 margin: EdgeInsets.fromLTRB(30.0, 10, 30.0, 20.0),
-                child: new Row(
+                child: Row(
                   children: <Widget>[
-                    new Expanded(
-                      child: new FlatButton(
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0),
-                        ),
-                        color: Colors.redAccent,
+                    Expanded(
+                      child: ElevatedButton(
                         onPressed: () {
                           navigateToStep3(context);
                         },
-                        child: new Container(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 20.0,
                             horizontal: 20.0,
                           ),
-                          child: Text(
+                          child: const Text(
                             "Continuar",
                             textAlign: TextAlign.center,
                             style: TextStyle(

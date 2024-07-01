@@ -1,53 +1,41 @@
 import 'dart:async';
-
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'student.dart';
+import 'Student.dart';
 
 class DbHelperStudent {
-  static final DbHelperStudent _instance = new DbHelperStudent.internal();
+  static final DbHelperStudent _instance = DbHelperStudent.internal();
 
   factory DbHelperStudent() => _instance;
 
   final String databaseName = 'etracker.db';
   final String tableStudent = 'studentTable';
-  final String columnId = 'id';
   final String columnPickupKey = 'pickupKey';
   final String columnSchoolKey = 'schoolKey';
   final String columnName = 'name';
   final String columnSchool = 'school';
   final String columnSchedule = 'schedule';
   final String columnExpire = 'expire';
-
-  static Database _db;
-
   DbHelperStudent.internal();
 
-  Future<Database> get getDb async {
-    if (_db == null) {
-      _db = await _initDb();
-      _createDbTable();
-    }
-    return _db;
-  }
-
-  Future<void> _createDbTable() async{
-    await _db.execute(
-        'CREATE TABLE IF NOT EXISTS $tableStudent($columnId INTEGER PRIMARY KEY, $columnPickupKey TEXT, $columnSchoolKey TEXT, $columnName TEXT, $columnSchool TEXT deded, $columnSchedule TEXT, $columnExpire TEXT)');
-  }
+  static Database? _db;
+  Future<Database> get getDb async =>
+      _db ??= await _initDb();
 
   _initDb() async {
     print('initDb()');
     String databasesPath = await getDatabasesPath();
     String path = join(databasesPath, databaseName);
     var db = await openDatabase(path, version: 1, onCreate: _onCreate);
+    await db.execute(
+        'CREATE TABLE IF NOT EXISTS $tableStudent($columnPickupKey TEXT PRIMARY KEY, $columnSchoolKey TEXT, $columnName TEXT, $columnSchool TEXT deded, $columnSchedule TEXT, $columnExpire TEXT)');
     return db;
   }
 
   void _onCreate(Database db, int newVersion) async {
     print('_onCreate Student Table');
     await db.execute(
-        'CREATE TABLE $tableStudent($columnId INTEGER PRIMARY KEY, $columnPickupKey TEXT, $columnSchoolKey TEXT, $columnName TEXT, $columnSchool TEXT, $columnSchedule TEXT, $columnExpire TEXT)');
+        'CREATE TABLE $tableStudent($columnPickupKey TEXT, $columnSchoolKey TEXT, $columnName TEXT, $columnSchool TEXT, $columnSchedule TEXT, $columnExpire TEXT)');
   }
 
   Future<int> saveStudent(Student student) async {
@@ -60,46 +48,49 @@ class DbHelperStudent {
   Future<List> getAllStudents() async {
     print('getAllStudents()');
     var dbClient = await getDb;
-    var result = await dbClient.query(tableStudent, columns: [columnId, columnPickupKey, columnSchoolKey, columnName, columnSchool, columnSchedule, columnExpire]);
+    var result = await dbClient.query(tableStudent, columns: [columnPickupKey, columnSchoolKey, columnName, columnSchool, columnSchedule, columnExpire]);
     return result.toList();
   }
 
-  Future<int> getCount() async {
+  Future<int?> getCount() async {
     var dbClient = await getDb;
     return Sqflite.firstIntValue(await dbClient.rawQuery('SELECT COUNT(*) FROM $tableStudent'));
   }
 
-  Future<Student> getStudent(int id) async {
+  Future<Student> getStudent(String pickupKey) async {
     var dbClient = await getDb;
-    List<Map> result = await dbClient.query(tableStudent,
-        columns: [columnId, columnPickupKey, columnSchoolKey, columnName, columnSchool, columnSchedule, columnExpire],
-        where: '$columnId = ?',
-        whereArgs: [id]);
+    List<Map<String, dynamic>> result = await dbClient.query(tableStudent,
+        columns: [columnPickupKey, columnSchoolKey, columnName, columnSchool, columnSchedule, columnExpire],
+        where: '$columnPickupKey = ?',
+        whereArgs: [pickupKey]);
 
-    if (result.length > 0) {
-      return new Student.fromMap(result.first);
+    if (result.isNotEmpty) {
+      return Student.fromMap(result.first);
     }
-    return null;
+    else {
+      return Student ("Default","Default","Default","Default","Default","Default");
+    }
+
   }
 
-  Future<int> deleteStudent(int id) async {
+  Future<int> deleteStudent(String pickupKey) async {
     var dbClient = await getDb;
-    return await dbClient.delete(tableStudent, where: '$columnId = ?', whereArgs: [id]);
+    return await dbClient.delete(tableStudent, where: '$columnPickupKey = ?', whereArgs: [pickupKey]);
   }
 
-  Future<int> updateStudent(Student msg) async {
+  Future<int> updateStudent(Student student) async {
     var dbClient = await getDb;
-    return await dbClient.update(tableStudent, msg.toMap(), where: "$columnId = ?", whereArgs: [msg.getId]);
+    return await dbClient.update(tableStudent, student.toMap(), where: "$columnPickupKey = ?", whereArgs: [student.getPickupKey]);
   }
 
   Future<void> clearTableContents() async {
-    await _db.execute(
-        'DELETE FROM ${tableStudent}');
+    await _db?.execute(
+        'DELETE FROM ${tableStudent!}');
   }
 
   Future<void> deleteTable() async {
-    await _db.execute(
-        'DROP TABLE IF EXISTS ${tableStudent}');
+    await _db?.execute(
+        'DROP TABLE IF EXISTS ${tableStudent!}');
   }
 
   Future<void> deleteDb() async {
@@ -115,3 +106,6 @@ class DbHelperStudent {
     return dbClient.close();
   }
 }
+
+
+

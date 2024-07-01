@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class Message {
-  int _id;
   var _date;
-  String _msg;
+  int _id = 0;
+  String _msg = "_msg";
   bool _checkBox=false;
 
   Message(this._date, this._msg);

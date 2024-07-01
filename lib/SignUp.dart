@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'Login.dart';
 
 class SignUp extends StatefulWidget {
+  const SignUp({super.key, required this.title});
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
   @override
-  _SignUpState createState() => _SignUpState();
+  State<SignUp> createState() => _SignUpState();
 }
 
 class _SignUpState extends State<SignUp> {
@@ -22,6 +34,7 @@ class _SignUpState extends State<SignUp> {
       'su cuenta de eTracker Schools. Si usted no recibe correo por favor revise'
       ' en su folder correo no deseado.';
 
+  /*
   Future<void> _signup() async {
     var map = Map<String, dynamic>();
     map['action'] = 'register';
@@ -44,7 +57,7 @@ class _SignUpState extends State<SignUp> {
       print("Error");
     }
   }
-
+*/
   void _showDialog(String title, String msg) {
     // flutter defined function
     showDialog(
@@ -52,12 +65,12 @@ class _SignUpState extends State<SignUp> {
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text(title),
-          content: new Text(msg),
+          title: Text(title),
+          content: Text(msg),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Close"),
+            TextButton(
+              child: const Text("Close"),
               onPressed: () {
                 if(title == 'Confirma tu correo'){
                   navigateToLogin(context);
@@ -74,7 +87,7 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future navigateToLogin(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+    //Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
   }
 
   @override
@@ -86,17 +99,17 @@ class _SignUpState extends State<SignUp> {
           decoration: BoxDecoration(
             color: Colors.white,
             image: DecorationImage(
-              colorFilter: new ColorFilter.mode(
+              colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(0.1), BlendMode.dstATop),
-              image: AssetImage('assets/images/ninos2.jpg'),
+              image: const AssetImage('assets/images/ninos2.jpg'),
               fit: BoxFit.cover,
             ),
           ),
-          child: new Column(
+          child: Column(
             children: <Widget>[
               Container(
                 padding: EdgeInsets.all(40.0),
-                child: Center(
+                child: const Center(
                   child: Icon(
                     Icons.headset_mic,
                     color: Colors.redAccent,
@@ -104,12 +117,12 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              new Row(
+              const Row(
                 children: <Widget>[
-                  new Expanded(
-                    child: new Padding(
-                      padding: const EdgeInsets.only(left: 40.0),
-                      child: new Text(
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 40.0),
+                      child: Text(
                         "Correo electrónico",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -121,11 +134,11 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ],
               ),
-              new Container(
+              Container(
                 width: MediaQuery.of(context).size.width,
                 margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0, bottom:25.0),
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
                         color: Colors.redAccent,
@@ -134,16 +147,16 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
                 padding: const EdgeInsets.only(left: 0.0, right: 10.0),
-                child: new Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    new Expanded(
+                    Expanded(
                       child: TextField(
                         obscureText: false,
                         controller: emailCtrl,
                         textAlign: TextAlign.left,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: 'JuanGonzalez@cambridgecollege.com',
                           hintStyle: TextStyle(color: Colors.grey),
@@ -153,12 +166,12 @@ class _SignUpState extends State<SignUp> {
                   ],
                 ),
               ),
-              new Row(
+              const Row(
                 children: <Widget>[
-                  new Expanded(
-                    child: new Padding(
+                  Expanded(
+                    child: Padding(
                       padding: const EdgeInsets.only(left: 40.0),
-                      child: new Text(
+                      child: Text(
                         "Contraseña",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -170,11 +183,11 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ],
               ),
-              new Container(
+              Container(
                 width: MediaQuery.of(context).size.width,
                 margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0, bottom:25.0),
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
                         color: Colors.redAccent,
@@ -183,16 +196,16 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
                 padding: const EdgeInsets.only(left: 0.0, right: 10.0),
-                child: new Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    new Expanded(
+                    Expanded(
                       child: TextField(
                         obscureText: true,
                         controller: passwordCtrl,
                         textAlign: TextAlign.left,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: '*********',
                           hintStyle: TextStyle(color: Colors.grey),
@@ -202,12 +215,12 @@ class _SignUpState extends State<SignUp> {
                   ],
                 ),
               ),
-              new Row(
+              const Row(
                 children: <Widget>[
-                  new Expanded(
-                    child: new Padding(
+                  Expanded(
+                    child: Padding(
                       padding: const EdgeInsets.only(left: 40.0),
-                      child: new Text(
+                      child: Text(
                         "Nombre",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -219,11 +232,11 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ],
               ),
-              new Container(
+              Container(
                 width: MediaQuery.of(context).size.width,
                 margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0, bottom:25.0),
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
                         color: Colors.redAccent,
@@ -232,16 +245,16 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
                 padding: const EdgeInsets.only(left: 0.0, right: 10.0),
-                child: new Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    new Expanded(
+                    Expanded(
                       child: TextField(
                         obscureText: false,
                         controller: nameCtrl,
                         textAlign: TextAlign.left,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintStyle: TextStyle(color: Colors.grey),
                         ),
@@ -250,12 +263,12 @@ class _SignUpState extends State<SignUp> {
                   ],
                 ),
               ),
-              new Row(
+              const Row(
                 children: <Widget>[
-                  new Expanded(
-                    child: new Padding(
+                  Expanded(
+                    child: Padding(
                       padding: const EdgeInsets.only(left: 40.0),
-                      child: new Text(
+                      child: Text(
                         "Apellido",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -267,11 +280,11 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ],
               ),
-              new Container(
+              Container(
                 width: MediaQuery.of(context).size.width,
                 margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0, bottom:10.0),
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
                         color: Colors.redAccent,
@@ -280,16 +293,16 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
                 padding: const EdgeInsets.only(left: 0.0, right: 10.0),
-                child: new Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    new Expanded(
+                    Expanded(
                       child: TextField(
                         obscureText: false,
                         controller: lastNameCtrl,
                         textAlign: TextAlign.left,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintStyle: TextStyle(color: Colors.grey),
                         ),
@@ -298,13 +311,13 @@ class _SignUpState extends State<SignUp> {
                   ],
                 ),
               ),
-              new Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(right: 20.0),
-                    child: new FlatButton(
-                      child: new Text(
+                    child: TextButton(
+                      child: const Text(
                         "Ya tienes una cuenta?",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -320,25 +333,21 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ],
               ),
-              new Container(
+              Container(
                 width: MediaQuery.of(context).size.width,
                 margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 10.0),
                 alignment: Alignment.center,
-                child: new Row(
+                child: Row(
                   children: <Widget>[
-                    new Expanded(
-                      child: new FlatButton(
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0),
-                        ),
-                        color: Colors.redAccent,
-                        onPressed: _signup,
-                        child: new Container(
+                    Expanded(
+                      child: TextButton(
+                        onPressed: null,//_signup,
+                        child: Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 20.0,
                             horizontal: 20.0,
                           ),
-                          child: Text(
+                          child: const Text(
                             "Registrarse",
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -357,3 +366,4 @@ class _SignUpState extends State<SignUp> {
     );
   }
 }
+
